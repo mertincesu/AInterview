@@ -1,19 +1,22 @@
 <template>
   <div class="interview-container">
     <button class="back-button" @click="$emit('go-back')">Back</button>
+    <h2>{{ field }}</h2>
     <div class="question-section">
-      <h2>Field: {{ field }}</h2>
-      <QuestionComponent :question="currentQuestion" />
-      <div class="recording-indicator" v-if="isRecording">
-        <span class="dot"></span> Recording...
-      </div>
-      <button v-if="!recorded" @click="toggleRecording">{{ isRecording ? 'Stop Recording' : 'Record Answer' }}</button>
+      <p v-if="!questions.length">Loading...</p>
+      <p v-if="questions.length && !currentQuestion">No questions available for this field.</p>
+      <QuestionComponent v-if="currentQuestion" :question="currentQuestion" />
     </div>
-    <audio v-if="audioURL" :src="audioURL" controls></audio>
-    <div class="feedback-container" v-if="feedback">
+    <button @click="toggleRecording">
+      {{ isRecording ? 'Stop Recording' : 'Record Answer' }}
+    </button>
+    <button @click="nextQuestion" :disabled="isRecording || !currentQuestion">Next</button>
+    <div v-if="audioURL" class="audio-container">
+      <audio :src="audioURL" controls></audio>
+    </div>
+    <div v-if="feedback">
       <FeedbackComponent :feedback="feedback" />
     </div>
-    <button class="next-button" @click="nextQuestion" :disabled="isRecording">Next</button>
   </div>
 </template>
 
@@ -46,15 +49,15 @@ export default {
   },
   computed: {
     currentQuestion() {
-      return this.questions[this.currentQuestionIndex] || 'Loading...';
+      return this.questions[this.currentQuestionIndex] || null;
     },
   },
   async created() {
     try {
       const response = await fetch('/src/assets/questions.json');
       const data = await response.json();
-      if (data[this.field]) {
-        this.questions = this.shuffleArray(data[this.field]);
+      if (data[this.field.toLowerCase()]) {
+        this.questions = this.shuffleArray(data[this.field.toLowerCase()]);
       } else {
         console.error('No questions available for this field.');
       }
@@ -127,7 +130,6 @@ export default {
           this.recognition.stop();
         }
 
-        // Simulate getting feedback (for demonstration purposes)
         this.processTranscript(this.transcript);
       };
 
@@ -138,7 +140,6 @@ export default {
       this.mediaRecorder.stop();
     },
     async processTranscript(transcript) {
-      // Simulate getting feedback (for demonstration purposes)
       this.feedback = `Feedback for the response: ${transcript}`;
     },
     nextQuestion() {
@@ -151,48 +152,34 @@ export default {
       this.feedback = '';
       this.transcript = '';
       this.recorded = false;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
 .interview-container {
-  text-align: left;
+  text-align: center;
   position: relative;
   padding: 20px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 800px; /* Set a fixed width */
+  width: 800px;
   max-width: 100%;
-  min-height: 400px; /* Set a minimum height */
   margin: 0 auto;
-}
-
-@media (max-width: 800px) {
-  .interview-container {
-    width: 100%; /* Full width for smaller screens */
-    padding: 10px;
-  }
 }
 
 .back-button {
   position: absolute;
-  top: 20px;
-  left: -80px;
+  top: 5px;
+  left: 20px;
   background-color: #4CAF50;
   color: white;
+  padding: 10px;
   border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
   border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.back-button:hover {
-  background-color: #45a049;
+  cursor: pointer;
 }
 
 .question-section {
@@ -201,33 +188,9 @@ export default {
   border-radius: 8px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 150px; /* Set a fixed height */
-  overflow-y: auto; /* Allow scrolling if content overflows */
-  word-wrap: break-word; /* Ensure long words break to fit within the container */
-}
-
-.recording-indicator {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-  color: red;
-  font-weight: bold;
-}
-
-.dot {
-  height: 12px;
-  width: 12px;
-  background-color: red;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 10px;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
+  height: 150px;
+  overflow-y: auto;
+  word-wrap: break-word;
 }
 
 button {
@@ -238,37 +201,28 @@ button {
   font-size: 16px;
   cursor: pointer;
   border-radius: 5px;
-  transition: background-color 0.3s;
-  margin-top: 20px;
+  margin: 10px 0;
+  margin-left: 10px;
 }
 
-button:hover {
-  background-color: #45a049;
-}
-
-.next-button {
-  background-color: #2196F3;
-  color: white;
-  margin-top: 20px;
-}
-
-.next-button:disabled {
-  background-color: #ccc;
+button:disabled {
+  background-color: #ddd;
   cursor: not-allowed;
 }
 
-.feedback-container {
-  background-color: #e9f5e9;
-  border: 1px solid #c8e6c9;
-  border-radius: 8px;
-  padding: 20px;
+.audio-container {
   margin-top: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.feedback-container p {
-  margin: 0;
-  font-size: 16px;
-  color: #333;
+.audio-container audio {
+  width: 100%;
+}
+
+.feedback {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #dff0d8;
+  border: 1px solid #d6e9c6;
+  border-radius: 5px;
 }
 </style>

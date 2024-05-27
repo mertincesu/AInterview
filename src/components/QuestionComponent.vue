@@ -8,10 +8,7 @@
   export default {
     name: 'QuestionComponent',
     props: {
-      question: {
-        type: String,
-        required: true
-      }
+      question: String
     }
   };
   </script>
@@ -19,7 +16,7 @@
   <style scoped>
   .question {
     font-size: 18px;
-    margin-bottom: 20px;
+    color: #333;
   }
   </style>
   

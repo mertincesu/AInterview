@@ -33,7 +33,6 @@ export default {
     },
     goBack() {
       this.currentStep = 'home';
-      this.selectedField = '';
     },
   },
 };
@@ -41,7 +40,7 @@ export default {
 
 <style>
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f5f5f5;
@@ -50,7 +49,7 @@ body {
 
 #app {
   text-align: center;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -64,7 +63,6 @@ header {
 
 header h1 {
   margin: 0;
-  font-size: 24px;
 }
 
 main {
