@@ -1,7 +1,7 @@
 <template>
   <div class="interview-container">
     <button class="back-button" @click="$emit('go-back')">Back</button>
-    <h2>{{ field }}</h2>
+    <h2>Field: {{ field }}</h2>
     <div class="question-section">
       <p v-if="!questions.length">Loading...</p>
       <p v-if="questions.length && !currentQuestion">No questions available for this field.</p>
@@ -14,37 +14,35 @@
     <div v-if="audioURL" class="audio-container">
       <audio :src="audioURL" controls></audio>
     </div>
-    <div v-if="feedback">
-      <FeedbackComponent :feedback="feedback" />
+    <div v-if="feedback" class="feedback">
+      {{ feedback }}
+    </div>
+    <div v-if="error" class="error">
+      {{ error }}
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 import QuestionComponent from './QuestionComponent.vue';
-import FeedbackComponent from './FeedbackComponent.vue';
 
 export default {
   name: 'InterviewComponent',
-  components: {
-    QuestionComponent,
-    FeedbackComponent,
-  },
-  props: {
-    field: String,
-  },
+  components: { QuestionComponent },
+  props: { field: String },
   data() {
     return {
       questions: [],
       currentQuestionIndex: 0,
       feedback: '',
+      error: '',
       isRecording: false,
       recorded: false,
       mediaRecorder: null,
       audioChunks: [],
       audioURL: null,
       transcript: '',
-      recognition: null,
     };
   },
   computed: {
@@ -64,34 +62,8 @@ export default {
     } catch (error) {
       console.error('Error fetching questions:', error);
     }
-    this.initSpeechRecognition();
   },
   methods: {
-    initSpeechRecognition() {
-      if ('webkitSpeechRecognition' in window) {
-        this.recognition = new webkitSpeechRecognition();
-      } else if ('SpeechRecognition' in window) {
-        this.recognition = new SpeechRecognition();
-      } else {
-        console.error('Speech Recognition API not supported in this browser.');
-      }
-
-      if (this.recognition) {
-        this.recognition.continuous = false;
-        this.recognition.interimResults = false;
-        this.recognition.lang = 'en-US';
-
-        this.recognition.onresult = (event) => {
-          const result = event.results[0][0].transcript;
-          this.transcript = result;
-          this.processTranscript(result);
-        };
-
-        this.recognition.onerror = (event) => {
-          console.error('Speech recognition error', event);
-        };
-      }
-    },
     shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -110,10 +82,6 @@ export default {
       this.isRecording = true;
       this.audioChunks = [];
 
-      if (this.recognition) {
-        this.recognition.start();
-      }
-
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.mediaRecorder = new MediaRecorder(stream);
 
@@ -121,16 +89,11 @@ export default {
         this.audioChunks.push(event.data);
       };
 
-      this.mediaRecorder.onstop = () => {
+      this.mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
         this.audioURL = URL.createObjectURL(audioBlob);
         this.recorded = true;
-
-        if (this.recognition) {
-          this.recognition.stop();
-        }
-
-        this.processTranscript(this.transcript);
+        await this.transcribeAudio(audioBlob);
       };
 
       this.mediaRecorder.start();
@@ -139,8 +102,31 @@ export default {
       this.isRecording = false;
       this.mediaRecorder.stop();
     },
-    async processTranscript(transcript) {
-      this.feedback = `Feedback for the response: ${transcript}`;
+    async transcribeAudio(audioBlob) {
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = async () => {
+        const audioData = reader.result.split(',')[1];
+        try {
+          const response = await axios.post('http://localhost:3000/transcribe', { audioData });
+          this.transcript = response.data.transcript;
+          console.log('Transcribed Text:', this.transcript);
+          this.getFeedback(this.currentQuestion, this.transcript);
+        } catch (error) {
+          console.error('Error transcribing audio:', error);
+          this.error = 'Error transcribing audio. Please try again.';
+        }
+      };
+    },
+    async getFeedback(question, transcript) {
+      try {
+        const response = await axios.post('http://localhost:3000/analyze', { question, response: transcript });
+        this.feedback = response.data.feedback;
+        this.error = '';
+      } catch (error) {
+        console.error('Error analyzing response:', error);
+        this.error = 'Error analyzing response. Please try again.';
+      }
     },
     nextQuestion() {
       if (this.currentQuestionIndex < this.questions.length - 1) {
@@ -165,14 +151,14 @@ export default {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 800px;
+  width: 600px;
   max-width: 100%;
   margin: 0 auto;
 }
 
 .back-button {
   position: absolute;
-  top: 5px;
+  top: 20px;
   left: 20px;
   background-color: #4CAF50;
   color: white;
@@ -224,5 +210,14 @@ button:disabled {
   background-color: #dff0d8;
   border: 1px solid #d6e9c6;
   border-radius: 5px;
+}
+
+.error {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c2c7;
+  border-radius: 5px;
+  color: #721c24;
 }
 </style>
