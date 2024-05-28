@@ -1,19 +1,51 @@
 <template>
-  <div class="home">
-    <h2>Select a Field</h2>
-    <div class="fields">
-      <div
-        v-for="field in fields"
-        :key="field"
-        :class="['field', { selected: selectedField === field }]"
-        @click="selectField(field)"
-      >
-        {{ field }}
+  <div class="home-container">
+    <!-- Navigation bar -->
+    <div class="navbar">
+      <div class="navbar-content">
+        <div class="navbar-title">
+          <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
+        </div>
+        <div class="navbar-buttons">
+          <button class="nav-button" @click="$emit('go-back')">DASHBOARD</button>
+          <button class="nav-button">ABOUT</button>
+          <button class="nav-button">SIGN IN / JOIN</button>
+        </div>
       </div>
     </div>
-    <button @click="startInterview" :disabled="!selectedField" class="start-button">
-      Start Interview
-    </button>
+
+    <!-- Main content area -->
+    <div class="main-content d-flex justify-content-center align-items-center">
+      <div class="card text-center p-4 card-container">
+        <h4 class="card-title">Select a Field</h4>
+        <div class="field-buttons">
+          <button
+            v-for="field in fields"
+            :key="field"
+            :class="['field-button', { active: selectedField === field }]"
+            @click="selectField(field)"
+          >
+            {{ field }}
+          </button>
+        </div>
+        <div v-if="selectedField">
+          <h5 class="subfield-title">Select a Sub-field</h5>
+          <div class="subfield-buttons">
+            <button
+              v-for="subField in subFields[selectedField]"
+              :key="subField"
+              :class="['field-button', { active: selectedSubField === subField }]"
+              @click="selectSubField(subField)"
+            >
+              {{ subField }}
+            </button>
+          </div>
+        </div>
+        <button :disabled="!selectedSubField" @click="startInterview" class="btn btn-primary mt-3 start-button">
+          Start Interview
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -22,93 +54,209 @@ export default {
   name: 'Home',
   data() {
     return {
-      selectedField: '',
+      selectedField: null,
+      selectedSubField: null,
       fields: ['Software', 'Marketing', 'Finance', 'Healthcare', 'Education'],
+      subFields: {
+        Software: ['Frontend', 'Backend', 'Devops'],
+        Marketing: ['Market Research', 'Brand Management', 'Digital Marketing'],
+        Finance: ['Investment Banking', 'Personal Finance', 'Corporate Finance'],
+        Healthcare: ['Clinical Practice', 'Healthcare Management', 'Public Health'],
+        Education: ['Curriculum Development', 'Instructional Design', 'Education Management'],
+      },
     };
   },
   methods: {
     selectField(field) {
+      console.log('Field selected:', field);
       this.selectedField = field;
+      this.selectedSubField = null; // Reset sub-field selection
+    },
+    selectSubField(subField) {
+      console.log('Sub-field selected:', subField);
+      this.selectedSubField = subField;
     },
     startInterview() {
-      if (this.selectedField) {
-        this.$emit('field-selected', this.selectedField);
-      } else {
-        alert('Please select a field.');
-      }
+      this.$emit('field-selected', { field: this.selectedField, subField: this.selectedSubField });
     },
   },
 };
 </script>
 
 <style scoped>
-.home {
-  text-align: center;
-  animation: fadeIn 1s ease-in-out;
+/* Global font style */
+:root {
+  font-family: 'Roboto', sans-serif;
 }
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-h2 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #4CAF50;
-}
-
-.fields {
+/* Container for the entire home page */
+.home-container {
+  height: 100vh;
   display: flex;
-  justify-content: space-around;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  background-image: linear-gradient(to right, #1c92d2, #23a997);
 }
 
-.field {
-  background-color: #4CAF50;
-  color: white;
-  padding: 15px 25px;
-  margin: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
-  font-size: 1.2rem;
+/* Navbar styles */
+.navbar {
+  width: 100%;
+  height: 100px;
+  background-color: #ffffff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Align title to the left and buttons to the right */
+  padding: 0 40px; /* Add padding to the left and right */
 }
 
-.field:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+/* Navbar content styles */
+.navbar-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  padding: 0 40px; /* Add more padding to the left and right */
 }
 
-.field.selected {
-  background-color: #45a049;
-  border: 5px solid #1723a4;
+/* Navbar title */
+.navbar-title-bold {
+  font-size: 30px;
+  font-weight: bold;
+  color: #000;
 }
 
-.start-button {
-  background-color: #4CAF50;
-  color: white;
+.navbar-title-semi-bold {
+  font-size: 30px;
+  font-weight: 400;
+  color: #000;
+}
+
+/* Navbar buttons container */
+.navbar-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+/* Navbar button styles */
+.nav-button {
+  background: none;
   border: none;
-  padding: 10px 20px;
-  font-size: 1.2rem;
+  color: #000;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.nav-button:hover {
+  color: #317ddf;
+}
+
+/* Main content area styles */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-top: 100px;
+}
+
+/* Card container styles */
+.card-container {
+  width: 1600px;
+  height: 80%;
+  padding: 50px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Card title styles */
+.card-title {
+  color: #317ddf;
+  margin-bottom: 20px;
+  font-size: 25px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+/* Sub-field title styles */
+.subfield-title {
+  color: #317ddf;
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 40px;
+  text-transform: uppercase;
+  width: 100%; /* Add this */
+  text-align: center; /* Add this */
+}
+
+/* Field buttons container styles */
+.field-buttons, .subfield-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-top: 10px;
+}
+
+/* Field button styles */
+.field-button {
+  flex: 1 1 200px;
+  padding: 15px 25px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #317ddf;
+  border: none;
   border-radius: 8px;
-  transition: background-color 0.3s;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.field-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.field-button.active {
+  background-color: #23a997;
+}
+
+
+
+/* Start button styles */
+.start-button {
+  width: 20%;
+  padding: 15px 0;
+  font-size: 1.5em;
+  font-weight: bold;
+  background-color: #317ddf;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .start-button:disabled {
-  background-color: #ddd;
+  background-color: #cccccc;
   cursor: not-allowed;
-}
-
-.start-button:not(:disabled):hover {
-  background-color: #45a049;
 }
 </style>

@@ -1,8 +1,5 @@
 <template>
   <div id="app">
-    <header>
-      <h1>Interview Simulator</h1>
-    </header>
     <main>
       <Home v-if="currentStep === 'home'" @field-selected="startInterview" />
       <InterviewComponent v-else :field="selectedField" @go-back="goBack" />
@@ -13,22 +10,27 @@
 <script>
 import Home from './components/Home.vue';
 import InterviewComponent from './components/InterviewComponent.vue';
+import About from './components/About.vue';
 
 export default {
   name: 'App',
   components: {
     Home,
     InterviewComponent,
+    About,
   },
   data() {
     return {
       currentStep: 'home',
-      selectedField: '',
+      selectedField: null,
+      selectedSubField: null,
     };
   },
   methods: {
-    startInterview(field) {
-      this.selectedField = field;
+    startInterview({ field, subField }) {
+      console.log('Field selected:', field);
+      console.log('Sub-field selected:', subField);
+      this.selectedField = { field, subField };
       this.currentStep = 'interview';
     },
     goBack() {
@@ -38,6 +40,7 @@ export default {
 };
 </script>
 
+
 <style>
 body {
   font-family: 'Roboto', sans-serif;
@@ -45,30 +48,15 @@ body {
   padding: 0;
   background-color: #f5f5f5;
   color: #333;
+  height: 100vh;
 }
 
 #app {
   text-align: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-header {
-  background-color: #4CAF50;
-  color: white;
-  padding: 20px 0;
-  margin-bottom: 20px;
-}
-
-header h1 {
-  margin: 0;
+  height: 100vh;
 }
 
 main {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: 100%;
 }
 </style>
