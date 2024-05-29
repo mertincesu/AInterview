@@ -7,9 +7,9 @@
           <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
         </div>
         <div class="navbar-buttons">
-          <button class="nav-button" @click="$emit('go-back')">DASHBOARD</button>
-          <button class="nav-button">ABOUT</button>
-          <button class="nav-button">SIGN IN / JOIN</button>
+          <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
+          <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
+          <button class="nav-button" @click="$emit('navigate-join')">SIGN IN / JOIN</button>
         </div>
       </div>
     </div>
@@ -296,6 +296,7 @@ export default {
   font-size: 25px;
   text-transform: uppercase;
   font-weight: bold;
+  animation: fadeIn 0.7s ease-in-out; /* Add this line */
 }
 
 /* Question section styles */
@@ -310,6 +311,7 @@ export default {
   font-size: 30px; /* Adjusted font size */
   font-family: 'Roboto', sans-serif;
   color: #333;
+  animation: fadeIn 0.7s ease-in-out; /* Add this line */
 }
 
 /* Button container styles */
@@ -335,6 +337,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: fadeIn 0.7s ease-in-out; /* Add this line */
 }
 
 .record-button {
@@ -352,6 +355,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: fadeIn 0.7s ease-in-out; /* Add this line */
 }
 
 .record-button:hover {
@@ -420,5 +424,15 @@ button:disabled {
   color: #721c24;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>
 

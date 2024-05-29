@@ -1,5 +1,5 @@
 <template>
-    <div class="about-container">
+    <div class="join-container">
       <!-- Navigation bar -->
       <div class="navbar">
         <div class="navbar-content">
@@ -8,8 +8,8 @@
           </div>
           <div class="navbar-buttons">
             <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
-            <button class="nav-button">ABOUT</button>
-            <button class="nav-button">SIGN IN / JOIN</button>
+            <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
+            <button class="nav-button" @click="$emit('navigate-join')">SIGN IN / JOIN</button>
           </div>
         </div>
       </div>
@@ -17,14 +17,22 @@
       <!-- Main content area -->
       <div class="main-content d-flex justify-content-center align-items-center">
         <div class="card text-center p-4 card-container">
-          <h4 class="about-title">About Us</h4>
-          <div class="about-content">
-            <p class="fade-in">Welcome to AInterview, the future of interview preparation. At AInterview, we harness the power of artificial intelligence to transform the way you get ready for your next big opportunity.</p>
-            <p class="fade-in">Our AI-powered platform provides personalized interview simulations that mimic real-life scenarios, helping you build confidence and improve your responses. With AInterview, you have access to a wide range of fields and sub-fields, ensuring that your preparation is tailored specifically to your career aspirations.</p>
-            <p class="fade-in">Our intelligent system analyzes your answers in real-time, offering constructive feedback to help you refine your skills. Whether you're preparing for a software development role, a marketing position, or any other field, AInterview is designed to help you succeed.</p>
-            <p class="fade-in">Join us and experience the next generation of interview preparation. With AInterview, your success is just one click away.</p>
-          </div>
-          <button class="go-back-button" @click="$emit('navigate-dashboard')">Go Back</button>
+          <h4 class="card-title">Sign In</h4>
+          <form @submit.prevent="handleSubmit">
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" id="email" v-model="email" required />
+            </div>
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input type="password" id="password" v-model="password" required />
+            </div>
+            <button type="submit" class="btn btn-primary mt-3 start-button">Submit</button>
+            <div class="jointext">
+                <span>Don't have an account? </span>
+                <button class="joinlink" @click="$emit('navigate-newacc')"> Join Us</button> 
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -32,7 +40,20 @@
   
   <script>
   export default {
-    name: 'About',
+    name: 'Join',
+    data() {
+      return {
+        email: '',
+        password: '',
+      };
+    },
+    methods: {
+      handleSubmit() {
+        // Handle form submission logic here
+        console.log('Email:', this.email);
+        console.log('Password:', this.password);
+      },
+    },
   };
   </script>
   
@@ -42,8 +63,8 @@
     font-family: 'Roboto', sans-serif;
   }
   
-  /* Container for the entire about page */
-  .about-container {
+  /* Container for the entire join page */
+  .join-container {
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -61,8 +82,8 @@
     left: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 40px;
+    justify-content: space-between; /* Align title to the left and buttons to the right */
+    padding: 0 40px; /* Add padding to the left and right */
   }
   
   /* Navbar content styles */
@@ -72,7 +93,7 @@
     width: 100%;
     height: 100%;
     justify-content: space-between;
-    padding: 0 40px;
+    padding: 0 40px; /* Add more padding to the left and right */
   }
   
   /* Navbar title */
@@ -121,62 +142,87 @@
   
   /* Card container styles */
   .card-container {
-    width: 60%;
+    width: 1600px;
+    height: 80%;
     padding: 50px;
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
-    animation: fadeIn 0.7s ease-in-out; /* Add this line */
+    animation: fadeIn 0.7s ease-in-out;
   }
   
-  /* About title styles */
-  .about-title {
+  /* Card title styles */
+  .card-title {
     color: #317ddf;
     margin-bottom: 20px;
-    font-size: 30px;
+    font-size: 25px;
     text-transform: uppercase;
     font-weight: bold;
+    animation: fadeIn 0.7s ease-in-out;
   }
   
-  /* About content styles */
-  .about-content p {
-    font-size: 18px;
-    line-height: 1.6;
-    color: #333;
+  /* Form group styles */
+  .form-group {
     margin-bottom: 20px;
-    opacity: 0;
-    animation: fadeIn 1s ease-in-out forwards;
-    animation-delay: 0.3s;
   }
   
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Go back button styles */
-  .go-back-button {
-    margin-top: 20px;
-    padding: 15px 25px;
+  .form-group label {
+    display: block;
     font-size: 16px;
     font-weight: bold;
-    color: #fff;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input {
+    width: 30%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #bebebe;
+    border-radius: 5px;
+  }
+  
+  /* Start button styles */
+  .start-button {
+    width: 20%;
+    padding: 15px 0;
+    font-size: 1.5em;
+    font-weight: bold;
     background-color: #317ddf;
+    color: #fff;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
   
-  .go-back-button:hover {
-    background-color: #23a997;
+  .start-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
   }
-  </style>
+
+  .jointext {
+    padding-top: 20px;
+  }
+
+  .joinlink:hover {
+    color: #317ddf;
+  }
+
+  .joinlink {
+    font-weight: bold;
+  }
+  
+  /* Animation styles */
+  @keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
   

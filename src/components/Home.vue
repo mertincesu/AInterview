@@ -7,9 +7,9 @@
           <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
         </div>
         <div class="navbar-buttons">
-          <button class="nav-button" @click="$emit('go-back')">DASHBOARD</button>
+          <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
           <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
-          <button class="nav-button">SIGN IN / JOIN</button>
+          <button class="nav-button" @click="$emit('navigate-join')">SIGN IN / JOIN</button>
         </div>
       </div>
     </div>
@@ -175,6 +175,7 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
+  animation: fadeIn 0.7s ease-in-out;
 }
 
 /* Card title styles */
@@ -184,6 +185,7 @@ export default {
   font-size: 25px;
   text-transform: uppercase;
   font-weight: bold;
+  animation: fadeIn 0.7s ease-in-out; /* Add this line */
 }
 
 /* Sub-field title styles */
@@ -196,6 +198,7 @@ export default {
   text-transform: uppercase;
   width: 100%; /* Add this */
   text-align: center; /* Add this */
+  animation: fadeIn 0.7s ease-in-out; /* Add this line */
 }
 
 /* Field buttons container styles */
@@ -224,6 +227,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: fadeIn 0.7s ease-in-out; /* Add this line */
 }
 
 .field-button:hover {
@@ -251,10 +255,22 @@ export default {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
+  
 }
 
 .start-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

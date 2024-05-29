@@ -53,7 +53,7 @@ app.post('/analyze', async (req, res) => {
         },
         {
           role: 'user',
-          content: `In less than 100 words, provide ONLY constructive but fair feedback including what was good and what needs improvement (WITHOUT saying anything else than the actual feedback response) for this interview response. Question: "${question}" Response: "${userResponse}"`,
+          content: `In 80 to 100 words, provide ONLY constructive but fair feedback (overall) acting as an interview tutor for this interview response. Question: "${question}" Response: "${userResponse}"`,
         },
       ],
       max_tokens: 100,
