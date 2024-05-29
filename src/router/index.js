@@ -1,7 +1,8 @@
 // src/router/index.js
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../components/Home.vue'
-import InterviewComponent from '../components/InterviewComponent.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '../components/Home.vue';
+import InterviewComponent from '../components/InterviewComponent.vue';
+import About from '../components/About.vue';
 
 const routes = [
   {
@@ -10,16 +11,21 @@ const routes = [
     component: Home
   },
   {
-    path: '/interview/:field',
+    path: '/interview/:field/:subField',
     name: 'interview',
     component: InterviewComponent,
     props: true
+  },
+  {
+    path: '/about',
+    name: 'about',
+    component: About
   }
-]
+];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
-})
+});
 
-export default router
+export default router;

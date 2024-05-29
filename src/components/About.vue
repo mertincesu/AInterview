@@ -1,5 +1,5 @@
 <template>
-    <div class="home-container">
+    <div class="about-container">
       <!-- Navigation bar -->
       <div class="navbar">
         <div class="navbar-content">
@@ -7,8 +7,8 @@
             <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
           </div>
           <div class="navbar-buttons">
-            <button class="nav-button">DASHBOARD</button>
-            <button class="nav-button">ABOUT</button>
+            <button class="nav-button" @click="$emit('go-back')">DASHBOARD</button>
+            <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
             <button class="nav-button">SIGN IN / JOIN</button>
           </div>
         </div>
@@ -17,14 +17,32 @@
       <!-- Main content area -->
       <div class="main-content d-flex justify-content-center align-items-center">
         <div class="card text-center p-4 card-container">
-          <h4 class="card-title">THIS IS ABOUT PAGE</h4>
-          </div>
-          <button :disabled="!selectedSubField" @click="startInterview" class="btn btn-primary mt-3 start-button">
-            Start Interview
+          <h4 class="card-title">About Us</h4>
+          <p class="abouttext">
+            Welcome to AInterview, the future of interview preparation. At AInterview, we harness the power of artificial intelligence to transform the way you get ready for your next big opportunity.
+          </p>
+          <p class="abouttext">
+            Our AI-powered platform provides personalized interview simulations that mimic real-life scenarios, helping you build confidence and improve your responses. With AInterview, you have access to a wide range of fields and sub-fields, ensuring that your preparation is tailored specifically to your career aspirations.
+          </p>
+          <p class="abouttext">
+            Our intelligent system analyzes your answers in real-time, offering constructive feedback to help you refine your skills. Whether you're preparing for a software development role, a marketing position, or any other field, AInterview is designed to help you succeed.
+          </p>
+          <p class="abouttext">
+            Join us and experience the next generation of interview preparation. With AInterview, your success is just one click away.
+          </p>
+          <button @click="$emit('go-back')" class="btn btn-primary mt-3 back-button">
+            Go Back
           </button>
         </div>
       </div>
+    </div>
   </template>
+  
+  <script>
+  export default {
+    name: 'About',
+  };
+  </script>
   
   <style scoped>
   /* Global font style */
@@ -33,7 +51,7 @@
   }
   
   /* Container for the entire home page */
-  .home-container {
+  .about-container {
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -114,10 +132,13 @@
     width: 1600px;
     height: 80%;
     padding: 50px;
+    padding-left: 200px;
+    padding-right: 200px;
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
+    font-size: 20px;
   }
   
   /* Card title styles */
@@ -127,6 +148,11 @@
     font-size: 25px;
     text-transform: uppercase;
     font-weight: bold;
+  }
+
+  .abouttext {
+    padding-top: 30px;
+    font-weight: 600;
   }
   
   /* Sub-field title styles */

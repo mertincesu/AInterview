@@ -1,8 +1,9 @@
 <template>
   <div id="app">
     <main>
-      <Home v-if="currentStep === 'home'" @field-selected="startInterview" />
-      <InterviewComponent v-else :field="selectedField" @go-back="goBack" />
+      <Home v-if="currentStep === 'home'" @field-selected="startInterview" @navigate-about="navigateToAbout" />
+      <InterviewComponent v-else-if="currentStep === 'interview'" :field="selectedField" @go-back="goBack" />
+      <About v-else-if="currentStep === 'about'" @go-back="goBack" />
     </main>
   </div>
 </template>
@@ -23,23 +24,22 @@ export default {
     return {
       currentStep: 'home',
       selectedField: null,
-      selectedSubField: null,
     };
   },
   methods: {
     startInterview({ field, subField }) {
-      console.log('Field selected:', field);
-      console.log('Sub-field selected:', subField);
       this.selectedField = { field, subField };
       this.currentStep = 'interview';
     },
     goBack() {
       this.currentStep = 'home';
     },
+    navigateToAbout() {
+      this.currentStep = 'about';
+    },
   },
 };
 </script>
-
 
 <style>
 body {

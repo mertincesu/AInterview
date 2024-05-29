@@ -8,7 +8,7 @@
         </div>
         <div class="navbar-buttons">
           <button class="nav-button" @click="$emit('go-back')">DASHBOARD</button>
-          <button class="nav-button">ABOUT</button>
+          <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
           <button class="nav-button">SIGN IN / JOIN</button>
         </div>
       </div>
@@ -234,8 +234,6 @@ export default {
 .field-button.active {
   background-color: #23a997;
 }
-
-
 
 /* Start button styles */
 .start-button {
