@@ -36,8 +36,13 @@ const routes = [
   },
   {
     path: '/dashboard',
-    name: 'diashboard',
+    name: 'dashboard',
     component: Dashboard
+  },
+  {
+    path: '/rally',
+    name: 'rally',
+    component: Rally
   }
 ];
 

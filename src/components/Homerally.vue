@@ -1,5 +1,5 @@
 <template>
-    <div class="home-container">
+    <div class="home-rally-container">
       <!-- Navigation bar -->
       <div class="navbar">
         <div class="navbar-content">
@@ -16,29 +16,34 @@
   
       <!-- Main content area -->
       <div class="main-content d-flex justify-content-center align-items-center">
-        <div class="cards-wrapper">
-          <div class="cards-container1">
-            <div class="card text-center p-4 card-container">
-              <h4 class="card-title">Recent Activities</h4>
-              <p>View your recent interview activities and feedback.</p>
-            </div>
-            <div class="card text-center p-4 card-container">
-              <h4 class="card-title">Upcoming Interviews</h4>
-              <p>Check your upcoming scheduled interviews.</p>
+        <div class="card text-center p-4 card-container">
+          <h4 class="card-title">Select a Field</h4>
+          <div class="field-buttons">
+            <button
+              v-for="field in fields"
+              :key="field"
+              :class="['field-button', { active: selectedField === field }]"
+              @click="selectField(field)"
+            >
+              {{ field }}
+            </button>
+          </div>
+          <div v-if="selectedField">
+            <h5 class="subfield-title">Select a Sub-field</h5>
+            <div class="subfield-buttons">
+              <button
+                v-for="subField in subFields[selectedField]"
+                :key="subField"
+                :class="['field-button', { active: selectedSubField === subField }]"
+                @click="selectSubField(subField)"
+              >
+                {{ subField }}
+              </button>
             </div>
           </div>
-          <div class="cards-container2">
-            <div class="card text-center p-4 card-container">
-              <h4 class="card-title">Performance Analytics</h4>
-              <p>Analyze your interview performance and progress.</p>
-            </div>
-            <div class="card text-center p-4 card-container">
-              <h4 class="card-title-interview">Start New Interview</h4>
-              <button @click="$emit('go-back')" class="btn btn-primary mt-3 start-button">Free-Style Mode</button>
-              <button @click="$emit('navigate-homerally')" class="btn btn-primary mt-3 start-button">Rally Mode</button>
-              <button @click="$emit('go-back')" class="btn btn-primary mt-3 start-button">Deep-Dive Mode</button>
-            </div>
-          </div>
+          <button :disabled="!selectedSubField" @click="startRally" class="btn btn-primary mt-3 start-button">
+            Start Rally
+          </button>
         </div>
       </div>
     </div>
@@ -46,7 +51,7 @@
   
   <script>
   export default {
-    name: 'Home',
+    name: 'Homerally',
     data() {
       return {
         selectedField: null,
@@ -71,8 +76,9 @@
         console.log('Sub-field selected:', subField);
         this.selectedSubField = subField;
       },
-      startInterview() {
+      startRally() {
         this.$emit('field-selected', { field: this.selectedField, subField: this.selectedSubField });
+        this.$emit('navigate-rally');
       },
     },
   };
@@ -85,7 +91,7 @@
   }
   
   /* Container for the entire home page */
-  .home-container {
+  .home-rally-container {
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -161,57 +167,84 @@
     padding-top: 100px;
   }
   
-  /* Cards wrapper styles */
-  .cards-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-  }
-  
-  /* Cards container styles */
-  .cards-container1, .cards-container2 {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-  }
-    
   /* Card container styles */
   .card-container {
-    width: 800px;
-    height: 300px;
-    padding: 20px;
+    width: 1600px;
+    height: 80%;
+    padding: 50px;
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
     animation: fadeIn 0.7s ease-in-out;
   }
   
   /* Card title styles */
   .card-title {
     color: #317ddf;
-    margin-bottom: 10px;
-    font-size: 18px;
-    text-transform: uppercase;
-    font-weight: bold;
-    animation: fadeIn 0.7s ease-in-out; /* Add this line */
-  }
-
-  .card-title-interview {
-    color: #317ddf;
     margin-bottom: 20px;
-    font-size: 18px;
+    font-size: 25px;
     text-transform: uppercase;
     font-weight: bold;
-    animation: fadeIn 0.7s ease-in-out; /* Add this line */
+    animation: fadeIn 0.7s ease-in-out;
+  }
+  
+  /* Sub-field title styles */
+  .subfield-title {
+    color: #317ddf;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    text-transform: uppercase;
+    width: 100%;
+    text-align: center;
+    animation: fadeIn 0.7s ease-in-out;
+  }
+  
+  /* Field buttons container styles */
+  .field-buttons, .subfield-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding-top: 10px;
+  }
+  
+  /* Field button styles */
+  .field-button {
+    flex: 1 1 200px;
+    padding: 15px 25px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #317ddf;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.7s ease-in-out;
+  }
+  
+  .field-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .field-button.active {
+    background-color: #23a997;
   }
   
   /* Start button styles */
   .start-button {
-    width: 100%;
-    padding: 10px 0;
-    font-size: 1em;
+    width: 20%;
+    padding: 15px 0;
+    font-size: 1.5em;
     font-weight: bold;
     background-color: #317ddf;
     color: #fff;
@@ -219,6 +252,10 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
   }
   
   .start-button:disabled {

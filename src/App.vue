@@ -6,7 +6,9 @@
       <About v-if="currentStep === 'about'" @go-back="goBack" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
       <Join v-if="currentStep === 'join'" @go-back="goBack" @navigate-newacc="goToNewAcc" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
       <Newacc v-if="currentStep === 'newacc'" @go-back="goBack" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
-      <Dashboard v-if="currentStep === 'dashboard'" @go-back="goBack" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
+      <Dashboard v-if="currentStep === 'dashboard'" @go-back="goBack" @navigate-homerally="goToHomerally" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin" @navigate-rally="goToRally"/>
+      <Rally v-if="currentStep === 'rally'" :field="selectedField" @go-back="goBack" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
+      <HomeRally v-if="currentStep === 'homerally'" @field-selected="startRally" @go-back="goBack" @navigate-dashboard="goToDashboard"/>
     </main>
   </div>
 </template>
@@ -18,6 +20,8 @@ import About from './components/About.vue';
 import Join from './components/Join.vue';
 import Newacc from './components/Newacc.vue';
 import Dashboard from './components/Dashboard.vue';
+import Rally from './components/Rally.vue';
+import HomeRally from './components/Homerally.vue';
 
 export default {
   name: 'App',
@@ -28,6 +32,8 @@ export default {
     Join,
     Newacc,
     Dashboard,
+    Rally,
+    HomeRally,
   },
   data() {
     return {
@@ -41,6 +47,12 @@ export default {
       console.log('Sub-field selected:', subField);
       this.selectedField = { field, subField };
       this.currentStep = 'interview';
+    },
+    startRally({ field, subField }) {
+      console.log('Field selected for rally:', field);
+      console.log('Sub-field selected for rally:', subField);
+      this.selectedField = { field, subField };
+      this.currentStep = 'rally';
     },
     goBack() {
       this.currentStep = 'home';
@@ -56,6 +68,12 @@ export default {
     },
     goToDashboard() {
       this.currentStep = 'dashboard';
+    },
+    goToRally() {
+      this.currentStep = 'rally';
+    },
+    goToHomerally() {
+      this.currentStep = 'homerally';
     },
   },
 };

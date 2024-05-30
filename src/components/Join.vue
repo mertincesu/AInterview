@@ -1,63 +1,69 @@
 <template>
-    <div class="join-container">
-      <!-- Navigation bar -->
-      <div class="navbar">
-        <div class="navbar-content">
-          <div class="navbar-title">
-            <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
-          </div>
-          <div class="navbar-buttons">
-            <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
-            <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
-            <button class="nav-button" @click="$emit('navigate-join')">SIGN IN / JOIN</button>
-          </div>
+  <div class="join-container">
+    <!-- Navigation bar -->
+    <div class="navbar">
+      <div class="navbar-content">
+        <div class="navbar-title">
+          <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
         </div>
-      </div>
-  
-      <!-- Main content area -->
-      <div class="main-content d-flex justify-content-center align-items-center">
-        <div class="card text-center p-4 card-container">
-          <h4 class="card-title">Sign In</h4>
-          <form @submit.prevent="handleSubmit">
-            <div class="form-group">
-              <label for="email">Email:</label>
-              <input type="email" id="email" v-model="email" required />
-            </div>
-            <div class="form-group">
-              <label for="password">Password:</label>
-              <input type="password" id="password" v-model="password" required />
-            </div>
-            <button type="submit" class="btn btn-primary mt-3 start-button">Submit</button>
-            <div class="jointext">
-                <span>Don't have an account? </span>
-                <button class="joinlink" @click="$emit('navigate-newacc')"> Join Us</button> 
-            </div>
-          </form>
+        <div class="navbar-buttons">
+          <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
+          <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
+          <button class="nav-button" @click="$emit('navigate-join')">SIGN IN / JOIN</button>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'Join',
-    data() {
-      return {
-        email: '',
-        password: '',
-      };
+
+    <!-- Main content area -->
+    <div class="main-content d-flex justify-content-center align-items-center">
+      <div class="card text-center p-4 card-container">
+        <h4 class="card-title">Sign In</h4>
+        <form @submit.prevent="handleSubmit">
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" v-model="email" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" v-model="password" required />
+          </div>
+          <button type="submit" class="btn btn-primary mt-3 start-button">Submit</button>
+          <div class="jointext">
+            <span>Don't have an account? </span>
+            <button class="joinlink" @click="$emit('navigate-newacc')"> Join Us</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+
+export default {
+  name: 'Join',
+  data() {
+    return {
+      email: '',
+      password: '',
+    };
+  },
+  methods: {
+    async handleSubmit() {
+      try {
+        await signInWithEmailAndPassword(auth, this.email, this.password);
+        this.$emit('auth-success');
+      } catch (error) {
+        console.error('Error signing in:', error);
+      }
     },
-    methods: {
-      handleSubmit() {
-        // Handle form submission logic here
-        console.log('Email:', this.email);
-        console.log('Password:', this.password);
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
+  },
+};
+</script>
+
+<style scoped>
   /* Global font style */
   :root {
     font-family: 'Roboto', sans-serif;

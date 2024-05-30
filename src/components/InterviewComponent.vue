@@ -26,7 +26,7 @@
         </div>
         <div class="button-container">
           <button class="record-button" @click="toggleRecording">
-            {{ isRecording ? 'Stop Recording' : 'Record Answer' }}
+            {{ isRecording ? `Stop Recording (${timeLeft}s)` : 'Record Answer' }}
           </button>
           <button class="next-button" @click="nextQuestion" :disabled="isRecording || !currentQuestion">Next</button>
         </div>
@@ -69,6 +69,8 @@ export default {
       audioChunks: [],
       audioURL: null,
       transcript: '',
+      timeLeft: 30,
+      countdownTimer: null,
     };
   },
   computed: {
@@ -120,7 +122,9 @@ export default {
     },
     async startRecording() {
       this.isRecording = true;
+      this.timeLeft = 30;
       this.audioChunks = [];
+      this.startCountdown();
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.mediaRecorder = new MediaRecorder(stream);
@@ -141,6 +145,7 @@ export default {
     stopRecording() {
       this.isRecording = false;
       this.mediaRecorder.stop();
+      clearInterval(this.countdownTimer);
     },
     async transcribeAudio(audioBlob) {
       const reader = new FileReader();
@@ -190,12 +195,20 @@ export default {
         }
       });
     },
+    startCountdown() {
+      this.countdownTimer = setInterval(() => {
+        if (this.timeLeft > 0) {
+          this.timeLeft--;
+        } else {
+          this.stopRecording();
+        }
+      }, 1000);
+    },
   },
 };
 </script>
 
 <style scoped>
-/* Global font style */
 /* Global font style */
 :root {
   font-family: 'Roboto', sans-serif;
@@ -282,7 +295,7 @@ export default {
 .card-container {
   width: 1600px;
   min-height: 80%;
-  padding: -20px;
+  padding: 20px;
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -435,4 +448,5 @@ button:disabled {
   }
 }
 </style>
+
 
