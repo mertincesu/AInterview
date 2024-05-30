@@ -1,18 +1,6 @@
 <template>
   <div class="interview-container">
     <!-- Navigation bar -->
-    <div class="navbar">
-      <div class="navbar-content">
-        <div class="navbar-title">
-          <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
-        </div>
-        <div class="navbar-buttons">
-          <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
-          <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
-          <button class="nav-button" @click="$emit('navigate-join')">SIGN IN / JOIN</button>
-        </div>
-      </div>
-    </div>
 
     <!-- Main content area -->
     <div class="main-content d-flex justify-content-center align-items-center">
@@ -47,6 +35,8 @@
 <script>
 import axios from 'axios';
 import QuestionComponent from './QuestionComponent.vue';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
 export default {
   name: 'InterviewComponent',
@@ -156,7 +146,8 @@ export default {
           const response = await axios.post('http://localhost:3000/transcribe', { audioData });
           this.transcript = response.data.transcript;
           console.log('Transcribed Text:', this.transcript);
-          this.getFeedback(this.currentQuestion, this.transcript);
+          await this.getFeedback(this.currentQuestion, this.transcript);
+          await this.saveQuestionData(this.currentQuestion, this.transcript, this.feedback);
         } catch (error) {
           console.error('Error transcribing audio:', error);
           this.error = 'Error transcribing audio. Please try again.';
@@ -172,6 +163,24 @@ export default {
       } catch (error) {
         console.error('Error analyzing response:', error);
         this.error = 'Error analyzing response. Please try again.';
+      }
+    },
+    async saveQuestionData(question, response, feedback) {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await addDoc(collection(db, 'users', user.uid, 'interviewData'), {
+            question,
+            response,
+            feedback,
+            timestamp: serverTimestamp(),
+          });
+          console.log('Question data saved successfully');
+        } catch (error) {
+          console.error('Error saving question data:', error);
+        }
+      } else {
+        console.error('User not authenticated');
       }
     },
     nextQuestion() {
@@ -216,69 +225,11 @@ export default {
 
 /* Container for the entire interview page */
 .interview-container {
-  height: 100vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background-image: linear-gradient(to right, #1c92d2, #23a997);
-}
-
-/* Navbar styles */
-.navbar {
-  width: 100%;
-  height: 100px;
-  background-color: #ffffff;
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Align title to the left and buttons to the right */
-  padding: 0 40px; /* Add padding to the left and right */
-}
-
-/* Navbar content styles */
-.navbar-content {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  justify-content: space-between;
-  padding: 0 40px; /* Add more padding to the left and right */
-}
-
-/* Navbar title */
-.navbar-title-bold {
-  font-size: 30px;
-  font-weight: bold;
-  color: #000;
-}
-
-.navbar-title-semi-bold {
-  font-size: 30px;
-  font-weight: 400;
-  color: #000;
-}
-
-/* Navbar buttons container */
-.navbar-buttons {
-  display: flex;
-  gap: 20px;
-}
-
-/* Navbar button styles */
-.nav-button {
-  background: none;
-  border: none;
-  color: #000;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.nav-button:hover {
-  color: #317ddf;
 }
 
 /* Main content area styles */
@@ -288,7 +239,6 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding-top: 100px;
 }
 
 /* Card container styles */

@@ -1,18 +1,6 @@
 <template>
     <div class="about-container">
       <!-- Navigation bar -->
-      <div class="navbar">
-        <div class="navbar-content">
-          <div class="navbar-title">
-            <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
-          </div>
-          <div class="navbar-buttons">
-            <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
-            <button class="nav-button">ABOUT</button>
-            <button class="nav-button">SIGN IN / JOIN</button>
-          </div>
-        </div>
-      </div>
   
       <!-- Main content area -->
       <div class="main-content d-flex justify-content-center align-items-center">
@@ -44,7 +32,7 @@
   
   /* Container for the entire about page */
   .about-container {
-    height: 100vh;
+    height: 90vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -116,7 +104,6 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding-top: 100px;
   }
   
   /* Card container styles */

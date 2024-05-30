@@ -1,88 +1,71 @@
 <template>
-    <div class="home-rally-container">
-      <!-- Navigation bar -->
-      <div class="navbar">
-        <div class="navbar-content">
-          <div class="navbar-title">
-            <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
-          </div>
-          <div class="navbar-buttons">
-            <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
-            <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
-            <button class="nav-button" @click="$emit('navigate-join')">SIGN IN / JOIN</button>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Main content area -->
-      <div class="main-content d-flex justify-content-center align-items-center">
-        <div class="card text-center p-4 card-container">
-          <h4 class="card-title">Select a Field</h4>
-          <div class="field-buttons">
-            <button
-              v-for="field in fields"
-              :key="field"
-              :class="['field-button', { active: selectedField === field }]"
-              @click="selectField(field)"
-            >
-              {{ field }}
-            </button>
-          </div>
-          <div v-if="selectedField">
-            <h5 class="subfield-title">Select a Sub-field</h5>
-            <div class="subfield-buttons">
-              <button
-                v-for="subField in subFields[selectedField]"
-                :key="subField"
-                :class="['field-button', { active: selectedSubField === subField }]"
-                @click="selectSubField(subField)"
-              >
-                {{ subField }}
-              </button>
-            </div>
-          </div>
-          <button :disabled="!selectedSubField" @click="startRally" class="btn btn-primary mt-3 start-button">
-            Start Rally
+  <div class="home-rally-container">
+    <!-- Main content area -->
+    <div class="main-content d-flex justify-content-center align-items-center">
+      <div class="card text-center p-4 card-container">
+        <h4 class="card-title">Select a Field</h4>
+        <div class="field-buttons">
+          <button
+            v-for="field in fields"
+            :key="field"
+            :class="['field-button', { active: selectedField === field }]"
+            @click="selectField(field)"
+          >
+            {{ field }}
           </button>
         </div>
+        <div v-if="selectedField">
+          <h5 class="subfield-title">Select a Sub-field</h5>
+          <div class="subfield-buttons">
+            <button
+              v-for="subField in subFields[selectedField]"
+              :key="subField"
+              :class="['field-button', { active: selectedSubField === subField }]"
+              @click="selectSubField(subField)"
+            >
+              {{ subField }}
+            </button>
+          </div>
+        </div>
+        <button :disabled="!selectedSubField" @click="startRally" class="btn btn-primary mt-3 start-button">
+          Start Rally
+        </button>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'Homerally',
-    data() {
-      return {
-        selectedField: null,
-        selectedSubField: null,
-        fields: ['Software', 'Marketing', 'Finance', 'Healthcare', 'Education'],
-        subFields: {
-          Software: ['Frontend', 'Backend', 'Devops'],
-          Marketing: ['Market Research', 'Brand Management', 'Digital Marketing'],
-          Finance: ['Investment Banking', 'Personal Finance', 'Corporate Finance'],
-          Healthcare: ['Clinical Practice', 'Healthcare Management', 'Public Health'],
-          Education: ['Curriculum Development', 'Instructional Design', 'Education Management'],
-        },
-      };
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Homerally',
+  data() {
+    return {
+      selectedField: null,
+      selectedSubField: null,
+      fields: ['Software', 'Marketing', 'Finance', 'Healthcare', 'Education'],
+      subFields: {
+        Software: ['Frontend', 'Backend', 'Devops'],
+        Marketing: ['Market Research', 'Brand Management', 'Digital Marketing'],
+        Finance: ['Investment Banking', 'Personal Finance', 'Corporate Finance'],
+        Healthcare: ['Clinical Practice', 'Healthcare Management', 'Public Health'],
+        Education: ['Curriculum Development', 'Instructional Design', 'Education Management'],
+      },
+    };
+  },
+  methods: {
+    selectField(field) {
+      this.selectedField = field;
+      this.selectedSubField = null; // Reset sub-field selection
     },
-    methods: {
-      selectField(field) {
-        console.log('Field selected:', field);
-        this.selectedField = field;
-        this.selectedSubField = null; // Reset sub-field selection
-      },
-      selectSubField(subField) {
-        console.log('Sub-field selected:', subField);
-        this.selectedSubField = subField;
-      },
-      startRally() {
-        this.$emit('field-selected', { field: this.selectedField, subField: this.selectedSubField });
-        this.$emit('navigate-rally');
-      },
+    selectSubField(subField) {
+      this.selectedSubField = subField;
     },
-  };
-  </script>
+    startRally() {
+      this.$emit('navigate-rally', { field: this.selectedField, subField: this.selectedSubField });
+    },
+  },
+};
+</script>
   
   <style scoped>
   /* Global font style */
@@ -92,69 +75,11 @@
   
   /* Container for the entire home page */
   .home-rally-container {
-    height: 100vh;
+    height: 90vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     background-image: linear-gradient(to right, #1c92d2, #23a997);
-  }
-  
-  /* Navbar styles */
-  .navbar {
-    width: 100%;
-    height: 100px;
-    background-color: #ffffff;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Align title to the left and buttons to the right */
-    padding: 0 40px; /* Add padding to the left and right */
-  }
-  
-  /* Navbar content styles */
-  .navbar-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    padding: 0 40px; /* Add more padding to the left and right */
-  }
-  
-  /* Navbar title */
-  .navbar-title-bold {
-    font-size: 30px;
-    font-weight: bold;
-    color: #000;
-  }
-  
-  .navbar-title-semi-bold {
-    font-size: 30px;
-    font-weight: 400;
-    color: #000;
-  }
-  
-  /* Navbar buttons container */
-  .navbar-buttons {
-    display: flex;
-    gap: 20px;
-  }
-  
-  /* Navbar button styles */
-  .nav-button {
-    background: none;
-    border: none;
-    color: #000;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-  
-  .nav-button:hover {
-    color: #317ddf;
   }
   
   /* Main content area styles */
@@ -164,7 +89,6 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding-top: 100px;
   }
   
   /* Card container styles */

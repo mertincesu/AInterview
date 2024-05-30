@@ -1,59 +1,6 @@
-<template>
-  <div class="join-container">
-    <!-- Navigation bar -->
-    <div class="navbar">
-      <div class="navbar-content">
-        <div class="navbar-title">
-          <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
-        </div>
-        <div class="navbar-buttons">
-          <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
-          <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
-          <button class="nav-button" @click="$emit('navigate-join')">SIGN IN / JOIN</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main content area -->
-    <div class="main-content d-flex justify-content-center align-items-center">
-      <div class="card text-center p-4 card-container">
-        <h4 class="card-title">Join Us</h4>
-        <form @submit.prevent="handleSubmit">
-          <div class="form-row1">
-            <div class="form-group">
-              <label for="firstname">First Name:</label>
-              <input type="text" id="firstname" v-model="firstname" required />
-            </div>
-            <div class="form-group">
-              <label for="lastname">Last Name:</label>
-              <input type="text" id="lastname" v-model="lastname" required />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" v-model="email" required class="email-input" />
-          </div>
-          <div class="form-row2">
-            <div class="form-group">
-              <label for="password">Password:</label>
-              <input type="password" id="password" v-model="password" required />
-            </div>
-            <div class="form-group">
-              <label for="country">Country:</label>
-              <input type="text" id="country" v-model="country" required />
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary mt-3 start-button">Submit</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
-import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { setDoc, doc } from 'firebase/firestore';
+import { auth } from '../firebase';
 
 export default {
   name: 'Newacc',
@@ -64,22 +11,16 @@ export default {
       email: '',
       password: '',
       country: '',
+      error: '',
     };
   },
   methods: {
     async handleSubmit() {
       try {
-        const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
-        const user = userCredential.user;
-        await setDoc(doc(db, 'users', user.uid), {
-          firstname: this.firstname,
-          lastname: this.lastname,
-          email: this.email,
-          country: this.country,
-        });
+        await createUserWithEmailAndPassword(auth, this.email, this.password);
         this.$emit('auth-success');
       } catch (error) {
-        console.error('Error signing up:', error);
+        this.error = 'Error signing up: ' + error.message;
       }
     },
   },
@@ -106,13 +47,14 @@ export default {
   width: 100%;
   height: 100px;
   background-color: #ffffff;
-  position: absolute;
+  position: fixed; /* Change from absolute to fixed */
   top: 0;
   left: 0;
   display: flex;
   align-items: center;
   justify-content: space-between; /* Align title to the left and buttons to the right */
   padding: 0 40px; /* Add padding to the left and right */
+  z-index: 10; /* Ensure the navbar is above other elements */
 }
 
 /* Navbar content styles */
@@ -166,18 +108,18 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding-top: 100px;
+  padding-top: 140px; /* Ensure padding to account for fixed navbar */
+  padding-bottom: 20px; /* Ensure extra padding at the bottom */
 }
 
 /* Card container styles */
 .card-container {
-  width: 1600px;
-  height: 80%;
+  width: 90%;
+  max-width: 1600px;
   padding: 50px;
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
   animation: fadeIn 0.7s ease-in-out;
 }
 
@@ -243,6 +185,11 @@ export default {
   cursor: not-allowed;
 }
 
+.error {
+  color: red;
+  margin-top: 20px;
+}
+
 /* Animation styles */
 @keyframes fadeIn {
   from {
@@ -255,5 +202,3 @@ export default {
   }
 }
 </style>
-
-  

@@ -6,6 +6,8 @@ import About from '../components/About.vue';
 import Join from '../components/Join.vue';
 import Newacc from '../components/Newacc.vue';
 import Dashboard from '../components/Dashboard.vue';
+import Homerally from '../components/Homerally.vue';
+import Rally from '../components/Rally.vue';
 
 const routes = [
   {
@@ -43,6 +45,21 @@ const routes = [
     path: '/rally',
     name: 'rally',
     component: Rally
+  },
+  {
+    path: '/homerally',
+    name: 'homerally',
+    component: Homerally
+  },
+  {
+    path: '/recentactivity',
+    name: 'recentactivity',
+    component: Recentactivity
+  },
+  {
+    path: '/analytics',
+    name: 'analytics',
+    component: Analytics
   }
 ];
 

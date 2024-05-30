@@ -1,19 +1,24 @@
 <template>
   <div id="app">
+    <navbar @navigate-dashboard="goToDashboard" @navigate-about="goToAbout" @navigate-join="goToJoin" @navigate-profile="goToProfile" @user-logged-out="handleUserLoggedOut" />
     <main>
-      <Home v-if="currentStep === 'home'" @field-selected="startInterview" @navigate-about="goToAbout" @navigate-join="goToJoin" @navigate-dashboard="goToDashboard"/>
-      <InterviewComponent v-if="currentStep === 'interview'" :field="selectedField" @go-back="goBack" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
-      <About v-if="currentStep === 'about'" @go-back="goBack" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
-      <Join v-if="currentStep === 'join'" @go-back="goBack" @navigate-newacc="goToNewAcc" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
-      <Newacc v-if="currentStep === 'newacc'" @go-back="goBack" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
-      <Dashboard v-if="currentStep === 'dashboard'" @go-back="goBack" @navigate-homerally="goToHomerally" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin" @navigate-rally="goToRally"/>
-      <Rally v-if="currentStep === 'rally'" :field="selectedField" @go-back="goBack" @navigate-dashboard="goToDashboard" @navigate-join="goToJoin"/>
-      <HomeRally v-if="currentStep === 'homerally'" @field-selected="startRally" @go-back="goBack" @navigate-dashboard="goToDashboard"/>
+      <Home v-if="currentStep === 'home'" @field-selected="startInterview" />
+      <InterviewComponent v-if="currentStep === 'interview'" :field="selectedField" @go-back="goBack" />
+      <About v-if="currentStep === 'about'" @go-back="goBack" />
+      <Join v-if="currentStep === 'join'" @go-back="goBack" @auth-success="goToDashboard" />
+      <Newacc v-if="currentStep === 'newacc'" @go-back="goBack" />
+      <Dashboard v-if="currentStep === 'dashboard'" @go-back="goBack" @navigate-analytics="goToAnalytics" @navigate-homerally="goToHomerally" @navigate-recentactivity="goToRecentactivity"/>
+      <Rally v-if="currentStep === 'rally'" :field="selectedField" @go-back="goBack" @navigate-homerally="goToHomerally"/>
+      <Profile v-if="currentStep === 'profile'" @go-back="goBack" />
+      <Homerally v-if="currentStep === 'homerally'" @go-back="goBack" @navigate-rally="goToRally" />
+      <Recentactivity v-if="currentStep === 'recentactivity'" @navigate-dashboard="goToDashboard"/>
+      <Analytics v-if="currentStep === 'analytics'" @navigate-dashboard="goToDashboard"/>
     </main>
   </div>
 </template>
 
 <script>
+import Navbar from './components/Navbar.vue';
 import Home from './components/Home.vue';
 import InterviewComponent from './components/InterviewComponent.vue';
 import About from './components/About.vue';
@@ -21,11 +26,15 @@ import Join from './components/Join.vue';
 import Newacc from './components/Newacc.vue';
 import Dashboard from './components/Dashboard.vue';
 import Rally from './components/Rally.vue';
-import HomeRally from './components/Homerally.vue';
+import Profile from './components/Profile.vue';
+import Homerally from './components/Homerally.vue';
+import Recentactivity from './components/Recentactivity.vue';
+import Analytics from './components/Analytics.vue';
 
 export default {
   name: 'App',
   components: {
+    Navbar,
     Home,
     InterviewComponent,
     About,
@@ -33,7 +42,10 @@ export default {
     Newacc,
     Dashboard,
     Rally,
-    HomeRally,
+    Profile,
+    Homerally,
+    Recentactivity,
+    Analytics,
   },
   data() {
     return {
@@ -47,12 +59,6 @@ export default {
       console.log('Sub-field selected:', subField);
       this.selectedField = { field, subField };
       this.currentStep = 'interview';
-    },
-    startRally({ field, subField }) {
-      console.log('Field selected for rally:', field);
-      console.log('Sub-field selected for rally:', subField);
-      this.selectedField = { field, subField };
-      this.currentStep = 'rally';
     },
     goBack() {
       this.currentStep = 'home';
@@ -69,11 +75,24 @@ export default {
     goToDashboard() {
       this.currentStep = 'dashboard';
     },
-    goToRally() {
+    goToRally(fieldDetails) {
+      this.selectedField = fieldDetails;
       this.currentStep = 'rally';
+    },
+    goToProfile() {
+      this.currentStep = 'profile';
     },
     goToHomerally() {
       this.currentStep = 'homerally';
+    },
+    handleUserLoggedOut() {
+      this.currentStep = 'join';
+    },
+    goToRecentactivity() {
+      this.currentStep = 'recentactivity';
+    },
+    goToAnalytics() {
+      this.currentStep = 'analytics';
     },
   },
 };
@@ -91,7 +110,7 @@ body {
 
 #app {
   text-align: center;
-  height: 100vh;
+  height: 90vh;
 }
 
 main {
