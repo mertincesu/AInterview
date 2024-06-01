@@ -270,7 +270,7 @@ export default {
   margin-top: 30px;
   margin-bottom: 30px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-weight: bold;
+
   font-size: 30px; /* Adjusted font size */
   font-family: 'Roboto', sans-serif;
   color: #333;

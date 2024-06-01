@@ -1,22 +1,22 @@
 <template>
     <div class="edit-profile-container">
       <div class="edit-profile-card">
-        <h2>Edit Profile</h2>
+        <h2 class="fade-in">EDIT PROFILE</h2>
         <form @submit.prevent="handleSubmit">
-          <div class="form-group">
+          <div class="form-group fade-in">
             <label for="firstname">First Name</label>
             <input type="text" v-model="firstname" id="firstname" required />
           </div>
-          <div class="form-group">
+          <div class="form-group fade-in">
             <label for="lastname">Last Name</label>
             <input type="text" v-model="lastname" id="lastname" required />
           </div>
-          <div class="form-group">
+          <div class="form-group fade-in">
             <label for="country">Country</label>
             <input type="text" v-model="country" id="country" required />
           </div>
-          <button type="submit" class="save-button">Save Changes</button>
-          <button @click="$emit('navigate-profile')" class="cancel-button">Cancel</button>
+          <button type="submit" class="save-button fade-in">Save Changes</button>
+          <button @click="cancelEdit" class="cancel-button fade-in">Cancel</button>
         </form>
         <div v-if="message" :class="{'success-message': message.type === 'success', 'error-message': message.type === 'error'}">
           {{ message.text }}
@@ -58,7 +58,7 @@
           });
           this.showMessage('Profile updated successfully.', 'success');
           setTimeout(() => {
-            this.$router.push('/profile');
+            this.$emit('navigate-profile');
           }, 3000); // Wait 3 seconds before redirecting
         } catch (error) {
           console.error('Error updating profile:', error);
@@ -66,7 +66,7 @@
         }
       },
       cancelEdit() {
-        this.$router.push('/profile');
+        this.$emit('navigate-profile');
       },
       showMessage(text, type) {
         this.message = { text, type };
@@ -94,16 +94,21 @@
     padding: 20px;
     width: 400px;
     text-align: center;
+    animation: fadeIn 0.7s ease-in-out;
   }
   
   h2 {
     margin-bottom: 20px;
     color: #317ddf;
+    font-weight: bold;
+    font-size: 20px;
+    animation: fadeIn 1s ease-in-out; /* Add animation to the title */
   }
   
   .form-group {
     margin-bottom: 15px;
     text-align: left;
+    animation: fadeIn 1s ease-in-out; /* Add animation to form groups */
   }
   
   .form-group label {
@@ -155,11 +160,24 @@
   .success-message {
     color: green;
     margin-top: 15px;
+    animation: fadeIn 1s ease-in-out;
   }
   
   .error-message {
     color: red;
     margin-top: 15px;
+    animation: fadeIn 1s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   </style>
   

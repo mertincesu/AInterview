@@ -49,14 +49,14 @@ app.post('/analyze', async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: 'You are a helpful assistant.',
+          content: 'You are an expert in interview feedback.',
         },
         {
           role: 'user',
-          content: `In 80 to 100 words, provide ONLY constructive but fair feedback (overall) acting as an interview tutor for this interview response. Question: "${question}" Response: "${userResponse}"`,
+          content: `In 80 to 100 words, provide ONLY constructive but fair feedback (overall) for this interview response. Question: "${question}" Response: "${userResponse}"`,
         },
       ],
-      max_tokens: 100,
+      max_tokens: 150,
       temperature: 0.7,
     }, {
       headers: {
