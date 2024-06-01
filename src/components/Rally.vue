@@ -40,6 +40,8 @@
 <script>
 import axios from 'axios';
 import QuestionComponent from './QuestionComponent.vue';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
 export default {
   name: 'Rally',
@@ -182,6 +184,10 @@ export default {
     async saveCompletedQuestion() {
       const currentQuestion = this.questions[this.currentQuestionIndex];
       const feedback = await this.getFeedback(currentQuestion, this.transcript);
+      const user = auth.currentUser;
+      if (user) {
+        await this.saveQuestionData(user.uid, currentQuestion, this.transcript, feedback);
+      }
       this.completedQuestions.push({
         question: currentQuestion,
         response: this.transcript,
@@ -193,6 +199,21 @@ export default {
       } else {
         this.currentQuestionIndex++;
         this.nextQuestion();
+      }
+    },
+    async saveQuestionData(userId, question, response, feedback) {
+      try {
+        await addDoc(collection(db, 'users', userId, 'interviewData'), {
+          question: question,
+          response: response,
+          feedback: feedback,
+          category: this.field.field,
+          subCategory: this.field.subField,
+          timestamp: serverTimestamp(),
+        });
+        console.log('Document written successfully');
+      } catch (e) {
+        console.error('Error adding document: ', e);
       }
     },
     nextQuestion() {

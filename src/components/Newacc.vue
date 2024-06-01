@@ -1,6 +1,47 @@
+<template>
+  <div class="join-container">
+    <div class="main-content d-flex justify-content-center align-items-center">
+      <div class="card text-center p-4 card-container">
+        <h4 class="card-title">CREATE AN ACCOUNT</h4>
+        <form @submit.prevent="handleSubmit">
+          <div class="form-row1">
+            <div class="form-group">
+              <label for="firstname">First Name</label>
+              <input type="text" v-model="firstname" id="firstname" required />
+            </div>
+            <div class="form-group">
+              <label for="lastname">Last Name</label>
+              <input type="text" v-model="lastname" id="lastname" required />
+            </div>
+          </div>
+          <div class="form-row2">
+            <div class="form-group email-input">
+              <label for="email">Email</label>
+              <input type="email" v-model="email" id="email" required />
+            </div>
+          </div>
+          <div class="form-row1">
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" v-model="password" id="password" required />
+            </div>
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input type="text" v-model="country" id="country" required />
+            </div>
+          </div>
+          <button type="submit" class="start-button">Sign Up</button>
+        </form>
+        <div v-if="error" class="error">{{ error }}</div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script>
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default {
   name: 'Newacc',
@@ -17,9 +58,24 @@ export default {
   methods: {
     async handleSubmit() {
       try {
-        await createUserWithEmailAndPassword(auth, this.email, this.password);
+        console.log(`Attempting to create user with: ${this.email} ${this.password}`);
+        const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
+        console.log('User created:', userCredential.user);
+
+        const user = userCredential.user;
+        const userData = {
+          firstname: this.firstname,
+          lastname: this.lastname,
+          email: this.email,
+          country: this.country,
+          createdAt: new Date().toISOString(),
+        };
+        console.log('Saving user data:', userData);
+        await setDoc(doc(db, 'users', user.uid), userData);
+
         this.$emit('auth-success');
       } catch (error) {
+        console.error('Error signing up:', error);
         this.error = 'Error signing up: ' + error.message;
       }
     },
@@ -35,70 +91,11 @@ export default {
 
 /* Container for the entire join page */
 .join-container {
-  height: 100vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background-image: linear-gradient(to right, #1c92d2, #23a997);
-}
-
-/* Navbar styles */
-.navbar {
-  width: 100%;
-  height: 100px;
-  background-color: #ffffff;
-  position: fixed; /* Change from absolute to fixed */
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Align title to the left and buttons to the right */
-  padding: 0 40px; /* Add padding to the left and right */
-  z-index: 10; /* Ensure the navbar is above other elements */
-}
-
-/* Navbar content styles */
-.navbar-content {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  justify-content: space-between;
-  padding: 0 40px; /* Add more padding to the left and right */
-}
-
-/* Navbar title */
-.navbar-title-bold {
-  font-size: 30px;
-  font-weight: bold;
-  color: #000;
-}
-
-.navbar-title-semi-bold {
-  font-size: 30px;
-  font-weight: 400;
-  color: #000;
-}
-
-/* Navbar buttons container */
-.navbar-buttons {
-  display: flex;
-  gap: 20px;
-}
-
-/* Navbar button styles */
-.nav-button {
-  background: none;
-  border: none;
-  color: #000;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.nav-button:hover {
-  color: #317ddf;
 }
 
 /* Main content area styles */
@@ -108,8 +105,7 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding-top: 140px; /* Ensure padding to account for fixed navbar */
-  padding-bottom: 20px; /* Ensure extra padding at the bottom */
+  padding-bottom: 20px;
 }
 
 /* Card container styles */

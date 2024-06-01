@@ -12,7 +12,7 @@
             <p class="fade-in">Our intelligent system analyzes your answers in real-time, offering constructive feedback to help you refine your skills. Whether you're preparing for a software development role, a marketing position, or any other field, AInterview is designed to help you succeed.</p>
             <p class="fade-in">Join us and experience the next generation of interview preparation. With AInterview, your success is just one click away.</p>
           </div>
-          <button class="go-back-button" @click="$emit('navigate-dashboard')">Go Back</button>
+          <button class="go-back-button" @click="$emit('navigate-dashboard')">Go To Dashboard</button>
         </div>
       </div>
     </div>
@@ -37,64 +37,6 @@
     flex-direction: column;
     justify-content: center;
     background-image: linear-gradient(to right, #1c92d2, #23a997);
-  }
-  
-  /* Navbar styles */
-  .navbar {
-    width: 100%;
-    height: 100px;
-    background-color: #ffffff;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 40px;
-  }
-  
-  /* Navbar content styles */
-  .navbar-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    padding: 0 40px;
-  }
-  
-  /* Navbar title */
-  .navbar-title-bold {
-    font-size: 30px;
-    font-weight: bold;
-    color: #000;
-  }
-  
-  .navbar-title-semi-bold {
-    font-size: 30px;
-    font-weight: 400;
-    color: #000;
-  }
-  
-  /* Navbar buttons container */
-  .navbar-buttons {
-    display: flex;
-    gap: 20px;
-  }
-  
-  /* Navbar button styles */
-  .nav-button {
-    background: none;
-    border: none;
-    color: #000;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-  
-  .nav-button:hover {
-    color: #317ddf;
   }
   
   /* Main content area styles */
@@ -163,7 +105,7 @@
   }
   
   .go-back-button:hover {
-    background-color: #23a997;
+    background-color: #2568c1;
   }
   </style>
   

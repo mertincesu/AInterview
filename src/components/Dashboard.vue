@@ -29,7 +29,7 @@
           <div class="card text-center p-4 card-container">
             <h4 class="card-title-interview">Start New Interview</h4>
             <button @click="$emit('go-back')" class="btn btn-primary mt-3 start-button">Free-Style Mode</button>
-            <button @click="$emit('navigate-homerally')" class="btn btn-primary mt-3 start-button">Rally Mode</button>
+            <button @click="$emit('navigate-homerally')" class="btn btn-primary mt-3 start-button">Rally-Out Mode</button>
             <button @click="$emit('go-back')" class="btn btn-primary mt-3 start-button">Deep-Dive Mode</button>
           </div>
         </div>
@@ -130,64 +130,6 @@ export default {
   background-image: linear-gradient(to right, #1c92d2, #23a997);
 }
 
-/* Navbar styles */
-.navbar {
-  width: 100%;
-  height: 100px;
-  background-color: #ffffff;
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-}
-
-/* Navbar content styles */
-.navbar-content {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  justify-content: space-between;
-  padding: 0 40px;
-}
-
-/* Navbar title */
-.navbar-title-bold {
-  font-size: 30px;
-  font-weight: bold;
-  color: #000;
-}
-
-.navbar-title-semi-bold {
-  font-size: 30px;
-  font-weight: 400;
-  color: #000;
-}
-
-/* Navbar buttons container */
-.navbar-buttons {
-  display: flex;
-  gap: 20px;
-}
-
-/* Navbar button styles */
-.nav-button {
-  background: none;
-  border: none;
-  color: #000;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.nav-button:hover {
-  color: #317ddf;
-}
-
 /* Main content area styles */
 .main-content {
   flex: 1;
@@ -269,6 +211,10 @@ export default {
 .start-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.start-button:hover {
+  background-color: #2568c1;
 }
 
 @keyframes fadeIn {

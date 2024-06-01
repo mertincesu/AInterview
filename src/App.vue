@@ -4,15 +4,16 @@
     <main>
       <Home v-if="currentStep === 'home'" @field-selected="startInterview" />
       <InterviewComponent v-if="currentStep === 'interview'" :field="selectedField" @go-back="goBack" />
-      <About v-if="currentStep === 'about'" @go-back="goBack" />
-      <Join v-if="currentStep === 'join'" @go-back="goBack" @auth-success="goToDashboard" />
+      <About v-if="currentStep === 'about'" @go-back="goBack" @navigate-dashboard="goToDashboard"/>
+      <Join v-if="currentStep === 'join'" @go-back="goBack" @navigate-newacc="goToNewacc" @auth-success="goToDashboard" />
       <Newacc v-if="currentStep === 'newacc'" @go-back="goBack" />
       <Dashboard v-if="currentStep === 'dashboard'" @go-back="goBack" @navigate-analytics="goToAnalytics" @navigate-homerally="goToHomerally" @navigate-recentactivity="goToRecentactivity"/>
       <Rally v-if="currentStep === 'rally'" :field="selectedField" @go-back="goBack" @navigate-homerally="goToHomerally"/>
-      <Profile v-if="currentStep === 'profile'" @go-back="goBack" />
+      <Profile v-if="currentStep === 'profile'" @go-back="goBack" @navigate-editprofile="goToEditprofile"/>
       <Homerally v-if="currentStep === 'homerally'" @go-back="goBack" @navigate-rally="goToRally" />
       <Recentactivity v-if="currentStep === 'recentactivity'" @navigate-dashboard="goToDashboard"/>
       <Analytics v-if="currentStep === 'analytics'" @navigate-dashboard="goToDashboard"/>
+      <Editprofile v-if="currentStep === 'editprofile'" @navigate-profile="goToProfile"/>
     </main>
   </div>
 </template>
@@ -30,6 +31,7 @@ import Profile from './components/Profile.vue';
 import Homerally from './components/Homerally.vue';
 import Recentactivity from './components/Recentactivity.vue';
 import Analytics from './components/Analytics.vue';
+import Editprofile from './components/Editprofile.vue';
 
 export default {
   name: 'App',
@@ -46,6 +48,7 @@ export default {
     Homerally,
     Recentactivity,
     Analytics,
+    Editprofile,
   },
   data() {
     return {
@@ -55,8 +58,6 @@ export default {
   },
   methods: {
     startInterview({ field, subField }) {
-      console.log('Field selected:', field);
-      console.log('Sub-field selected:', subField);
       this.selectedField = { field, subField };
       this.currentStep = 'interview';
     },
@@ -69,7 +70,7 @@ export default {
     goToJoin() {
       this.currentStep = 'join';
     },
-    goToNewAcc() {
+    goToNewacc() {
       this.currentStep = 'newacc';
     },
     goToDashboard() {
@@ -93,6 +94,9 @@ export default {
     },
     goToAnalytics() {
       this.currentStep = 'analytics';
+    },
+    goToEditprofile() {
+      this.currentStep = 'editprofile';
     },
   },
 };

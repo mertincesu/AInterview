@@ -4,15 +4,15 @@
       <div class="profile-header">
         <div class="profile-picture">{{ initial }}</div>
         <div class="profile-info">
-          <h2>{{ email }}</h2>
+          <h2>{{ fullName }}</h2>
+          <h4>{{ email }}</h4>
         </div>
       </div>
       <div class="profile-details">
         <div class="profile-section">
           <h3>Personal Information</h3>
           <p><strong>Full Name:</strong> {{ fullName }}</p>
-          <p><strong>Phone:</strong> {{ phone }}</p>
-          <p><strong>Address:</strong> {{ address }}</p>
+          <p><strong>Country:</strong> {{ country }}</p>
         </div>
         <div class="profile-section">
           <h3>Account Details</h3>
@@ -21,13 +21,35 @@
           <p><strong>Subscription:</strong> {{ subscription }}</p>
         </div>
       </div>
-      <button @click="logout" class="logout-button">Logout</button>
+      <div class="buttons-class">
+        <button @click="$emit('navigate-editprofile')" class="logout-button">Edit Profile</button>
+        <button @click="logout" class="logout-button">Logout</button>
+        <button @click="confirmDelete" class="delete-button">Delete Account</button>
+      </div>
+    </div>
+
+    <!-- Delete Account Confirmation Dialog -->
+    <div v-if="showConfirmDialog" class="confirm-dialog">
+      <div class="confirm-dialog-content">
+        <p>Are you sure you want to delete your account?</p>
+        <button @click="deleteAccount" class="confirm-button">Yes</button>
+        <button @click="cancelDelete" class="cancel-button">No</button>
+      </div>
+    </div>
+
+    <!-- Account Deleted Success Message -->
+    <div v-if="showSuccessMessage" class="success-message">
+      <div class="success-message-content">
+        <p>Account successfully deleted. Redirecting to sign-in page...</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { deleteUser } from 'firebase/auth';
 
 export default {
   name: 'Profile',
@@ -35,17 +57,30 @@ export default {
     return {
       email: '',
       initial: '',
-      fullName: 'John Doe', // Example data, replace with actual data
-      phone: '+1234567890', // Example data, replace with actual data
-      address: '123 Main St, Anytown, USA', // Example data, replace with actual data
-      memberSince: 'January 1, 2021', // Example data, replace with actual data
-      lastLogin: 'March 3, 2024', // Example data, replace with actual data
-      subscription: 'Premium', // Example data, replace with actual data
+      fullName: '',
+      country: '',
+      memberSince: '',
+      lastLogin: '',
+      subscription: 'Free', // Default value
+      showConfirmDialog: false,
+      showSuccessMessage: false,
     };
   },
-  created() {
+  async created() {
     this.email = auth.currentUser.email;
     this.initial = this.email.charAt(0).toUpperCase();
+
+    const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      this.fullName = `${userData.firstname} ${userData.lastname}`;
+      this.country = userData.country;
+    }
+
+    const creationTime = auth.currentUser.metadata.creationTime;
+    const lastSignInTime = auth.currentUser.metadata.lastSignInTime;
+    this.memberSince = new Date(creationTime).toLocaleDateString();
+    this.lastLogin = new Date(lastSignInTime).toLocaleDateString();
   },
   methods: {
     async logout() {
@@ -55,6 +90,27 @@ export default {
         this.$router.push('/');
       } catch (error) {
         console.error('Error logging out:', error);
+      }
+    },
+    confirmDelete() {
+      this.showConfirmDialog = true;
+    },
+    cancelDelete() {
+      this.showConfirmDialog = false;
+    },
+    async deleteAccount() {
+      try {
+        // Delete user document from Firestore
+        await deleteDoc(doc(db, 'users', auth.currentUser.uid));
+        // Delete the user from Firebase Auth
+        await deleteUser(auth.currentUser);
+        this.showConfirmDialog = false;
+        this.showSuccessMessage = true;
+        setTimeout(() => {
+          this.$router.push('/signin');
+        }, 3000);
+      } catch (error) {
+        console.error('Error deleting account:', error);
       }
     },
   },
@@ -83,12 +139,14 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
   width: 500px;
+  text-align: center;
   animation: fadeIn 0.7s ease-in-out;
 }
 
 /* Profile header styles */
 .profile-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
 }
@@ -104,7 +162,7 @@ export default {
   font-size: 50px;
   height: 100px;
   width: 100px;
-  margin-right: 20px;
+  margin-bottom: 10px;
 }
 
 /* Profile info styles */
@@ -112,6 +170,12 @@ export default {
   font-size: 24px;
   color: #333;
   margin: 0;
+}
+
+.profile-info h4 {
+  font-size: 18px;
+  color: #666;
+  margin: 5px 0;
 }
 
 /* Profile details styles */
@@ -136,13 +200,20 @@ export default {
   margin: 5px 0;
 }
 
+/* Buttons container styles */
+.buttons-class {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
 /* Logout button styles */
 .logout-button {
-  margin-top: 20px;
   padding: 10px 20px;
   font-size: 16px;
   color: #ffffff;
-  background-color: #d9534f;
+  background-color: #317ddf;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -150,7 +221,93 @@ export default {
 }
 
 .logout-button:hover {
+  background-color: #2568c1;
+}
+
+/* Delete button styles */
+.delete-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #bd2130;
+}
+
+/* Confirm dialog styles */
+.confirm-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.confirm-dialog-content {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-button {
+  background-color: #d9534f;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.confirm-button:hover {
   background-color: #c9302c;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+/* Success message styles */
+.success-message {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.success-message-content {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes fadeIn {
