@@ -1,6 +1,7 @@
 <template>
   <div class="profile-container">
-    <div class="profile-card">
+    <div v-if="loading" class="loading-spinner"></div>
+    <div v-else class="profile-card">
       <div class="profile-header">
         <div class="profile-picture">{{ initial }}</div>
         <div class="profile-info">
@@ -64,23 +65,30 @@ export default {
       subscription: 'Free', // Default value
       showConfirmDialog: false,
       showSuccessMessage: false,
+      loading: true, // Add a loading state
     };
   },
   async created() {
-    this.email = auth.currentUser.email;
-    this.initial = this.email.charAt(0).toUpperCase();
+    try {
+      this.email = auth.currentUser.email;
+      this.initial = this.email.charAt(0).toUpperCase();
 
-    const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      this.fullName = `${userData.firstname} ${userData.lastname}`;
-      this.country = userData.country;
+      const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        this.fullName = `${userData.firstname} ${userData.lastname}`;
+        this.country = userData.country;
+      }
+
+      const creationTime = auth.currentUser.metadata.creationTime;
+      const lastSignInTime = auth.currentUser.metadata.lastSignInTime;
+      this.memberSince = new Date(creationTime).toLocaleDateString();
+      this.lastLogin = new Date(lastSignInTime).toLocaleDateString();
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    } finally {
+      this.loading = false; // Set loading to false once data is fetched
     }
-
-    const creationTime = auth.currentUser.metadata.creationTime;
-    const lastSignInTime = auth.currentUser.metadata.lastSignInTime;
-    this.memberSince = new Date(creationTime).toLocaleDateString();
-    this.lastLogin = new Date(lastSignInTime).toLocaleDateString();
   },
   methods: {
     async logout() {
@@ -256,6 +264,7 @@ export default {
 .confirm-dialog-content {
   background: #ffffff;
   padding: 20px;
+  padding-top: 30px;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -310,6 +319,21 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Loading spinner styles */
+.loading-spinner {
+  border: 5px solid #f3f3f3; /* Light grey */
+  border-top: 5px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -321,3 +345,4 @@ export default {
   }
 }
 </style>
+

@@ -27,6 +27,16 @@
         <div v-if="error" class="error">
           {{ error }}
         </div>
+        <div class="scores">
+          <div class="score-container">
+            <h5 v-if="scoreFeedback !== null">Score</h5>
+            <CircularProgressBar v-if="scoreFeedback !== null" :percentage="scoreFeedback" />
+          </div>
+          <div class="score-container">
+            <h5 v-if="sentimentAnalysis !== null">Sentiment</h5>
+            <CircularProgressBar v-if="sentimentAnalysis !== null" :percentage="sentimentAnalysis" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -35,12 +45,13 @@
 <script>
 import axios from 'axios';
 import QuestionComponent from './QuestionComponent.vue';
+import CircularProgressBar from './CircularProgressBar.vue'; // Ensure this is correctly imported
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 export default {
   name: 'InterviewComponent',
-  components: { QuestionComponent },
+  components: { QuestionComponent, CircularProgressBar },
   props: {
     field: {
       type: Object,
@@ -61,6 +72,8 @@ export default {
       transcript: '',
       timeLeft: 30,
       countdownTimer: null,
+      sentimentAnalysis: null, // Ensure this is initialized
+      scoreFeedback: null,
     };
   },
   computed: {
@@ -147,7 +160,9 @@ export default {
           this.transcript = response.data.transcript;
           console.log('Transcribed Text:', this.transcript);
           await this.getFeedback(this.currentQuestion, this.transcript);
-          await this.saveQuestionData(this.currentQuestion, this.transcript, this.feedback);
+          await this.analyzeSentiment(this.transcript); // This line was updated
+          await this.getScore(this.currentQuestion, this.transcript);
+          await this.saveQuestionData(this.currentQuestion, this.transcript, this.feedback, this.sentimentAnalysis);
         } catch (error) {
           console.error('Error transcribing audio:', error);
           this.error = 'Error transcribing audio. Please try again.';
@@ -165,7 +180,29 @@ export default {
         this.error = 'Error analyzing response. Please try again.';
       }
     },
-    async saveQuestionData(question, response, feedback) {
+    async getScore(question, transcript) {
+      try {
+        const response = await axios.post('http://localhost:3000/score', { question, response: transcript });
+        this.scoreFeedback = response.data.scoreFeedback;
+        this.error = '';
+        this.$nextTick(() => this.adjustCardHeight());
+      } catch (error) {
+        console.error('Error analyzing response:', error);
+        this.error = 'Error analyzing response. Please try again.';
+      }
+    },
+    async analyzeSentiment(text) {
+      try {
+        const response = await axios.post('http://localhost:3000/sentiment', { text });
+        this.sentimentAnalysis = response.data.sentimentAnalysis;
+        this.error = '';
+        console.log('Sentiment Analysis Result:', this.sentimentAnalysis);
+      } catch (error) {
+        console.error('Error analyzing sentiment:', error);
+        this.error = 'Error analyzing sentiment. Please try again.';
+      }
+    },
+    async saveQuestionData(question, response, feedback, sentimentAnalysis) {
       const user = auth.currentUser;
       if (user) {
         try {
@@ -173,6 +210,7 @@ export default {
             question,
             response,
             feedback,
+            sentimentAnalysis,
             timestamp: serverTimestamp(),
           });
           console.log('Question data saved successfully');
@@ -193,6 +231,7 @@ export default {
       this.feedback = '';
       this.transcript = '';
       this.recorded = false;
+      this.sentimentAnalysis = null; // Reset sentiment score when moving to the next question
     },
     adjustCardHeight() {
       this.$nextTick(() => {
@@ -239,6 +278,7 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
+  overflow-y: auto; /* Ensure scrolling is handled by the main content */
 }
 
 /* Card container styles */
@@ -250,6 +290,7 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
+  margin-top: 15%; /* Added margin to create space below the navbar */
 }
 
 /* Card title styles */
@@ -259,7 +300,7 @@ export default {
   font-size: 25px;
   text-transform: uppercase;
   font-weight: bold;
-  animation: fadeIn 0.7s ease-in-out; /* Add this line */
+  animation: fadeIn 0.7s ease-in-out;
 }
 
 /* Question section styles */
@@ -270,11 +311,10 @@ export default {
   margin-top: 30px;
   margin-bottom: 30px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  font-size: 30px; /* Adjusted font size */
+  font-size: 30px;
   font-family: 'Roboto', sans-serif;
   color: #333;
-  animation: fadeIn 0.7s ease-in-out; /* Add this line */
+  animation: fadeIn 0.7s ease-in-out;
 }
 
 /* Button container styles */
@@ -300,7 +340,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.7s ease-in-out; /* Add this line */
+  animation: fadeIn 0.7s ease-in-out;
 }
 
 .record-button {
@@ -318,7 +358,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.7s ease-in-out; /* Add this line */
+  animation: fadeIn 0.7s ease-in-out;
 }
 
 .record-button:hover {
@@ -387,6 +427,55 @@ button:disabled {
   color: #721c24;
 }
 
+/* Scores container styles */
+.scores {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.score-container {
+  text-align: center;
+  width: 150px; /* Ensures both containers have the same width */
+}
+
+/* Circular progress bar styles */
+.circular-progress {
+  display: block;
+  margin: 10px auto;
+  width: 100%; /* Ensures both circular progress bars have the same size */
+}
+
+.circular-chart {
+  display: block;
+  margin: 10px auto;
+  width: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+.circle {
+  stroke: #4cc790;
+}
+
+.percentage {
+  fill: #666;
+  font-family: sans-serif;
+  font-size: 1em; /* Ensures the font size is consistent */
+  text-anchor: middle;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -397,6 +486,15 @@ button:disabled {
     transform: translateY(0);
   }
 }
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
 </style>
+
+
+
 
 

@@ -1,18 +1,18 @@
 <template>
-    <div class="navbar">
-      <div class="navbar-content">
-        <div class="navbar-title">
-          <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
-        </div>
-        <div class="navbar-buttons">
-          <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
-          <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
-          <button class="nav-button" v-if="isAuthenticated" @click="$emit('navigate-profile')">PROFILE</button>
-          <button class="nav-button" v-else @click="$emit('navigate-join')">SIGN IN / JOIN</button>
-        </div>
+  <div class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-title">
+        <span class="navbar-title-bold">AI</span><span class="navbar-title-semi-bold">nterview</span>
+      </div>
+      <div class="navbar-buttons">
+        <button class="nav-button" @click="$emit('navigate-dashboard')">DASHBOARD</button>
+        <button class="nav-button" @click="$emit('navigate-about')">ABOUT</button>
+        <button class="nav-button" v-if="isAuthenticated" @click="$emit('navigate-profile')">PROFILE</button>
+        <button class="nav-button" v-else @click="$emit('navigate-join')">SIGN IN / JOIN</button>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script>
   import { auth } from '../firebase';
