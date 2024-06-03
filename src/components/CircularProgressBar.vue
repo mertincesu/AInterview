@@ -13,7 +13,7 @@
             a 15.9155 15.9155 0 0 1 0 31.831
             a 15.9155 15.9155 0 0 1 0 -31.831"
         />
-        <text x="18" y="20.35" class="percentage">{{ percentage }}%</text>
+        <text x="18" y="20.35" class="percentage">{{ percentage }}</text>
       </svg>
     </div>
   </template>
@@ -79,6 +79,7 @@
     font-family: sans-serif;
     font-size: 0.5em;
     text-anchor: middle;
+    font-weight: bold;
   }
   
   @keyframes progress {

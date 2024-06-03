@@ -1,7 +1,5 @@
 <template>
   <div class="interview-container">
-    <!-- Navigation bar -->
-
     <!-- Main content area -->
     <div class="main-content d-flex justify-content-center align-items-center">
       <div class="card text-center p-4 card-container" ref="cardContainer">
@@ -29,11 +27,11 @@
         </div>
         <div class="scores">
           <div class="score-container">
-            <h5 v-if="scoreFeedback !== null">Score</h5>
+            <h5 class="score-title" v-if="scoreFeedback !== null">Score</h5>
             <CircularProgressBar v-if="scoreFeedback !== null" :percentage="scoreFeedback" />
           </div>
           <div class="score-container">
-            <h5 v-if="sentimentAnalysis !== null">Sentiment</h5>
+            <h5 class="score-title" v-if="sentimentAnalysis !== null">Sentiment</h5>
             <CircularProgressBar v-if="sentimentAnalysis !== null" :percentage="sentimentAnalysis" />
           </div>
         </div>
@@ -45,7 +43,7 @@
 <script>
 import axios from 'axios';
 import QuestionComponent from './QuestionComponent.vue';
-import CircularProgressBar from './CircularProgressBar.vue'; // Ensure this is correctly imported
+import CircularProgressBar from './CircularProgressBar.vue';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
@@ -72,7 +70,7 @@ export default {
       transcript: '',
       timeLeft: 30,
       countdownTimer: null,
-      sentimentAnalysis: null, // Ensure this is initialized
+      sentimentAnalysis: null,
       scoreFeedback: null,
     };
   },
@@ -160,9 +158,9 @@ export default {
           this.transcript = response.data.transcript;
           console.log('Transcribed Text:', this.transcript);
           await this.getFeedback(this.currentQuestion, this.transcript);
-          await this.analyzeSentiment(this.transcript); // This line was updated
+          await this.analyzeSentiment(this.transcript);
           await this.getScore(this.currentQuestion, this.transcript);
-          await this.saveQuestionData(this.currentQuestion, this.transcript, this.feedback, this.sentimentAnalysis);
+          await this.saveQuestionData(this.currentQuestion, this.transcript, this.feedback, this.sentimentAnalysis, this.scoreFeedback);
         } catch (error) {
           console.error('Error transcribing audio:', error);
           this.error = 'Error transcribing audio. Please try again.';
@@ -202,7 +200,7 @@ export default {
         this.error = 'Error analyzing sentiment. Please try again.';
       }
     },
-    async saveQuestionData(question, response, feedback, sentimentAnalysis) {
+    async saveQuestionData(question, response, feedback, sentimentAnalysis, scoreFeedback) {
       const user = auth.currentUser;
       if (user) {
         try {
@@ -211,6 +209,7 @@ export default {
             response,
             feedback,
             sentimentAnalysis,
+            scoreFeedback,
             timestamp: serverTimestamp(),
           });
           console.log('Question data saved successfully');
@@ -231,7 +230,8 @@ export default {
       this.feedback = '';
       this.transcript = '';
       this.recorded = false;
-      this.sentimentAnalysis = null; // Reset sentiment score when moving to the next question
+      this.sentimentAnalysis = null;
+      this.scoreFeedback = null;
     },
     adjustCardHeight() {
       this.$nextTick(() => {
@@ -239,7 +239,7 @@ export default {
         const cardContainerEl = this.$refs.cardContainer;
         if (feedbackEl && cardContainerEl) {
           const feedbackHeight = feedbackEl.offsetHeight;
-          cardContainerEl.style.paddingBottom = `${feedbackHeight + 20}px`;
+          cardContainerEl.style.paddingBottom = `${feedbackHeight + 5}px`;
         }
       });
     },
@@ -256,6 +256,7 @@ export default {
 };
 </script>
 
+
 <style scoped>
 /* Global font style */
 :root {
@@ -264,11 +265,12 @@ export default {
 
 /* Container for the entire interview page */
 .interview-container {
-  height: 90vh;
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background-image: linear-gradient(to right, #1c92d2, #23a997);
+  padding-bottom: 3%; /* Ensures the background extends beyond the bottom of the card */
 }
 
 /* Main content area styles */
@@ -276,9 +278,10 @@ export default {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Aligns the card to the top without intertwining with the navbar */
   width: 100%;
-  overflow-y: auto; /* Ensure scrolling is handled by the main content */
+  padding-top: 3%; /* Adds space at the top to avoid intertwining with the navbar */
+  overflow-y: auto; /* Ensures overflow content can be scrolled */
 }
 
 /* Card container styles */
@@ -290,7 +293,9 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
-  margin-top: 15%; /* Added margin to create space below the navbar */
+  top: 0; /* Keeps the card top fixed */
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 /* Card title styles */
@@ -436,7 +441,14 @@ button:disabled {
 
 .score-container {
   text-align: center;
-  width: 150px; /* Ensures both containers have the same width */
+  width: 200px; /* Ensures both containers have the same width */
+}
+
+.score-title {
+  font-size: 20px;
+  font-weight: bold;
+  padding-top: 20px;
+  padding-bottom: 10px;
 }
 
 /* Circular progress bar styles */
@@ -493,6 +505,8 @@ button:disabled {
   }
 }
 </style>
+
+
 
 
 
