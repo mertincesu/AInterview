@@ -9,9 +9,14 @@
             <input type="text" id="field-input" v-model="selectedField" placeholder="e.g., Software, Data Science, Marketing" />
             <label for="level-select">Select Your Experience Level:</label>
             <select id="level-select" v-model="selectedLevel">
+              <option value="professional">Middle School</option>
+              <option value="professional">High School</option>
+              <option value="professional">University</option>
               <option value="internship">Internship</option>
               <option value="entry">Entry Level</option>
+              <option value="entry">Professional</option>
               <option value="professional">Experienced Professional</option>
+              <option value="entry">Expert</option>
             </select>
             <label>Upload Your Resume / CV</label>
             <input type="file" @change="handleFileUpload" />
@@ -35,11 +40,24 @@
           <div v-if="audioURL" class="audio-container">
             <audio :src="audioURL" controls></audio>
           </div>
-          <div v-if="feedback" class="feedback" ref="feedback">
-            {{ feedback }}
-          </div>
-          <div v-if="error" class="error">
-            {{ error }}
+          <div v-if="loading" class="loading-spinner"></div>
+          <div v-if="!loading">
+            <div v-if="feedback" class="feedback" ref="feedback">
+              {{ feedback }}
+            </div>
+            <div v-if="error" class="error">
+              {{ error }}
+            </div>
+            <div class="scores">
+              <div class="score-container">
+                <h5 class="score-title" v-if="scoreFeedback !== null">Score</h5>
+                <CircularProgressBar v-if="scoreFeedback !== null" :percentage="scoreFeedback" />
+              </div>
+              <div class="score-container">
+                <h5 class="score-title" v-if="sentimentAnalysis !== null">Sentiment</h5>
+                <CircularProgressBar v-if="sentimentAnalysis !== null" :percentage="sentimentAnalysis" />
+              </div>
+            </div>
           </div>
         </template>
       </div>
@@ -49,11 +67,13 @@
 
 <script>
 import axios from 'axios';
+import CircularProgressBar from './CircularProgressBar.vue';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../firebase'; // Adjust the import path as needed
+import { auth, db } from '../firebase';
 
 export default {
   name: 'ResumeComponent',
+  components: { CircularProgressBar },
   data() {
     return {
       cvFile: null,
@@ -72,6 +92,9 @@ export default {
       questionsGenerated: false,
       selectedField: '',
       selectedLevel: 'internship',
+      sentimentAnalysis: null,
+      scoreFeedback: null,
+      loading: false, // Added loading state
     };
   },
   computed: {
@@ -145,11 +168,16 @@ export default {
           const response = await axios.post('http://localhost:3000/transcribe', { audioData });
           this.transcript = response.data.transcript;
           console.log('Transcribed Text:', this.transcript);
+          this.loading = true; // Start loading
           await this.getFeedback(this.currentQuestion, this.transcript);
-          await this.saveQuestionData(this.currentQuestion, this.transcript, this.feedback);
+          await this.analyzeSentiment(this.transcript);
+          await this.getScore(this.currentQuestion, this.transcript);
+          await this.saveQuestionData(this.currentQuestion, this.transcript, this.feedback, this.sentimentAnalysis, this.scoreFeedback);
+          this.loading = false; // End loading
         } catch (error) {
           console.error('Error transcribing audio:', error);
           this.error = 'Error transcribing audio. Please try again.';
+          this.loading = false; // End loading in case of error
         }
       };
     },
@@ -164,7 +192,29 @@ export default {
         this.error = 'Error analyzing response. Please try again.';
       }
     },
-    async saveQuestionData(question, response, feedback) {
+    async getScore(question, transcript) {
+      try {
+        const response = await axios.post('http://localhost:3000/score', { question, response: transcript });
+        this.scoreFeedback = response.data.scoreFeedback;
+        this.error = '';
+        this.$nextTick(() => this.adjustCardHeight());
+      } catch (error) {
+        console.error('Error analyzing response:', error);
+        this.error = 'Error analyzing response. Please try again.';
+      }
+    },
+    async analyzeSentiment(text) {
+      try {
+        const response = await axios.post('http://localhost:3000/sentiment', { text });
+        this.sentimentAnalysis = response.data.sentimentAnalysis;
+        this.error = '';
+        console.log('Sentiment Analysis Result:', this.sentimentAnalysis);
+      } catch (error) {
+        console.error('Error analyzing sentiment:', error);
+        this.error = 'Error analyzing sentiment. Please try again.';
+      }
+    },
+    async saveQuestionData(question, response, feedback, sentimentAnalysis, scoreFeedback) {
       const user = auth.currentUser;
       if (user) {
         try {
@@ -172,6 +222,8 @@ export default {
             question,
             response,
             feedback,
+            sentimentAnalysis,
+            scoreFeedback,
             timestamp: serverTimestamp(),
           });
           console.log('Question data saved successfully');
@@ -199,6 +251,8 @@ export default {
       this.feedback = '';
       this.transcript = '';
       this.recorded = false;
+      this.sentimentAnalysis = null;
+      this.scoreFeedback = null;
     },
     adjustCardHeight() {
       this.$nextTick(() => {
@@ -223,6 +277,7 @@ export default {
 };
 </script>
 
+
 <style scoped>
 /* Global font style */
 :root {
@@ -236,6 +291,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   background-image: linear-gradient(to right, #1c92d2, #23a997);
+  padding-bottom: 3%; /* Ensures the background extends beyond the bottom of the card */
 }
 
 /* Main content area styles */
@@ -243,8 +299,10 @@ export default {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Aligns the card to the top without intertwining with the navbar */
   width: 100%;
+  padding-top: 3%; /* Adds space at the top to avoid intertwining with the navbar */
+  overflow-y: auto; /* Ensures overflow content can be scrolled */
 }
 
 /* Card container styles */
@@ -257,6 +315,9 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
   animation: fadeIn 0.7s ease-in-out;
+  top: 0; /* Keeps the card top fixed */
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 /* Card title styles */
@@ -376,6 +437,76 @@ button:disabled {
   color: #721c24;
 }
 
+/* Scores container styles */
+.scores {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.score-container {
+  text-align: center;
+  width: 200px; /* Ensures both containers have the same width */
+}
+
+.score-title {
+  font-size: 20px;
+  font-weight: bold;
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+
+/* Circular progress bar styles */
+.circular-progress {
+  display: block;
+  margin: 10px auto;
+  width: 100%; /* Ensures both circular progress bars have the same size */
+}
+
+.circular-chart {
+  display: block;
+  margin: 10px auto;
+  width: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+.circle {
+  stroke: #4cc790;
+}
+
+.percentage {
+  fill: #666;
+  font-family: sans-serif;
+  font-size: 1em; /* Ensures the font size is consistent */
+  text-anchor: middle;
+}
+
+/* Loading spinner styles */
+.loading-spinner {
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -386,6 +517,22 @@ button:disabled {
     transform: translateY(0);
   }
 }
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 </style>
 
 

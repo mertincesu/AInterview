@@ -18,9 +18,10 @@
               <button v-if="interviewData.length > 2" @click="$emit('navigate-recentactivity')" class="btn btn-primary mt-3">See Recent Activity</button>
             </div>
             <div class="card text-center p-4 card-container">
-              <h4 class="card-title">PERSONALIZED INTERVIEW</h4>
-              <p>Get Tailored Interview Questions Created from Your Resume.</p>
-              <button @click="$emit('navigate-resume')" class="btn btn-primary mt-3 start-button">Upload Resume</button>
+              <h4 class="card-title">AI-GENERATED INTERVIEW</h4>
+              <button @click="$emit('go-back')" class="btn btn-primary mt-3 start-button">Free-Style Mode</button>
+              <button @click="$emit('navigate-homerally')" class="btn btn-primary mt-3 start-button">Rally-Out Mode</button>
+              <button @click="$emit('go-back')" class="btn btn-primary mt-3 start-button">Case-Study Mode</button>
             </div>
           </div>
           <div class="cards-container2">
@@ -31,23 +32,24 @@
               <p v-else><strong>Sign In</strong> to view Personal Analytics...</p>
               <button v-if="isUserLoggedIn && chartData" @click="$emit('navigate-analytics')" class="btn btn-primary mt-3">See More</button>
             </div>
+            
             <div class="card text-center p-4 card-container">
-              <h4 class="card-title-interview">AI-GENERATED INTERVIEW</h4>
-              <button @click="$emit('go-back')" class="btn btn-primary mt-3 start-button">Free-Style Mode</button>
-              <button @click="$emit('navigate-homerally')" class="btn btn-primary mt-3 start-button">Rally-Out Mode</button>
-              <button @click="$emit('go-back')" class="btn btn-primary mt-3 start-button">Case-Study Mode</button>
+              <h4 class="card-title">PERSONALIZED INTERVIEW</h4>
+              <p>Get Tailored Interview Questions Created from Your Resume.</p>
+              <button @click="$emit('navigate-resume')" class="btn btn-primary mt-3 start-button">Upload Resume</button>
             </div>
           </div>
           <div class="cards-container3">
             <div class="card text-center p-4 card-container">
-              <h4 class="card-title">MOCK INTERVIEW SCHEDULER</h4>
-              <p>Schedule mock interviews with industry experts.</p>
-              <button @click="$emit('navigate-scheduler')" class="btn btn-primary mt-3 start-button">Schedule Now</button>
+              <h4 class="card-title">SENTIMENT ANALYZER</h4>
+              <p>Refine answers with voice sentiment analysis.</p>
+              <button @click="$emit('navigate-sentiment')" class="btn btn-primary mt-3 start-button">Schedule Now</button>
             </div>
             <div class="card text-center p-4 card-container">
-              <h4 class="card-title">SENTIMENT ANALYSIS</h4>
-              <p>Refine answers with voice sentiment analysis.</p>
-              <button @click="$emit('navigate-sentiment')" class="btn btn-primary mt-3 start-button">Learn More</button>
+              <h4 class="card-title">SETTINGS & CONTACT US</h4>
+              <button @click="$emit('navigate-settings')" class="btn btn-primary mt-3 start-button">Settings</button>
+              <button class="btn btn-primary mt-3 start-button">Contact Us</button>
+              <button class="btn btn-primary mt-3 start-button">Learn More</button>
             </div>
           </div>
         </div>

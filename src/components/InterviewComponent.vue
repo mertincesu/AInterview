@@ -19,20 +19,25 @@
         <div v-if="audioURL" class="audio-container">
           <audio :src="audioURL" controls></audio>
         </div>
-        <div v-if="feedback" class="feedback" ref="feedback">
-          {{ feedback }}
+        <div v-if="loading" class="loading">
+          <p>Loading...</p>
         </div>
-        <div v-if="error" class="error">
-          {{ error }}
-        </div>
-        <div class="scores">
-          <div class="score-container">
-            <h5 class="score-title" v-if="scoreFeedback !== null">Score</h5>
-            <CircularProgressBar v-if="scoreFeedback !== null" :percentage="scoreFeedback" />
+        <div v-if="!loading">
+          <div v-if="feedback" class="feedback" ref="feedback">
+            {{ feedback }}
           </div>
-          <div class="score-container">
-            <h5 class="score-title" v-if="sentimentAnalysis !== null">Sentiment</h5>
-            <CircularProgressBar v-if="sentimentAnalysis !== null" :percentage="sentimentAnalysis" />
+          <div v-if="error" class="error">
+            {{ error }}
+          </div>
+          <div class="scores">
+            <div class="score-container">
+              <h5 class="score-title" v-if="scoreFeedback !== null">Score</h5>
+              <CircularProgressBar v-if="scoreFeedback !== null" :percentage="scoreFeedback" />
+            </div>
+            <div class="score-container">
+              <h5 class="score-title" v-if="sentimentAnalysis !== null">Sentiment</h5>
+              <CircularProgressBar v-if="sentimentAnalysis !== null" :percentage="sentimentAnalysis" />
+            </div>
           </div>
         </div>
       </div>
@@ -72,6 +77,7 @@ export default {
       countdownTimer: null,
       sentimentAnalysis: null,
       scoreFeedback: null,
+      loading: false,
     };
   },
   computed: {
@@ -157,47 +163,34 @@ export default {
           const response = await axios.post('http://localhost:3000/transcribe', { audioData });
           this.transcript = response.data.transcript;
           console.log('Transcribed Text:', this.transcript);
-          await this.getFeedback(this.currentQuestion, this.transcript);
-          await this.analyzeSentiment(this.transcript);
-          await this.getScore(this.currentQuestion, this.transcript);
-          await this.saveQuestionData(this.currentQuestion, this.transcript, this.feedback, this.sentimentAnalysis, this.scoreFeedback);
+          this.loading = true;
+          await this.loadAllData(this.currentQuestion, this.transcript);
         } catch (error) {
           console.error('Error transcribing audio:', error);
           this.error = 'Error transcribing audio. Please try again.';
         }
       };
     },
-    async getFeedback(question, transcript) {
+    async loadAllData(question, transcript) {
       try {
-        const response = await axios.post('http://localhost:3000/analyze', { question, response: transcript });
-        this.feedback = response.data.feedback;
+        const feedbackResponse = await axios.post('http://localhost:3000/analyze', { question, response: transcript });
+        const scoreResponse = await axios.post('http://localhost:3000/score', { question, response: transcript });
+        const sentimentResponse = await axios.post('http://localhost:3000/sentiment', { text: transcript });
+
+        this.feedback = feedbackResponse.data.feedback;
+        this.scoreFeedback = scoreResponse.data.scoreFeedback;
+        this.sentimentAnalysis = sentimentResponse.data.sentimentAnalysis;
+
         this.error = '';
+        this.loading = false;
+
         this.$nextTick(() => this.adjustCardHeight());
+
+        await this.saveQuestionData(question, transcript, this.feedback, this.sentimentAnalysis, this.scoreFeedback);
       } catch (error) {
-        console.error('Error analyzing response:', error);
-        this.error = 'Error analyzing response. Please try again.';
-      }
-    },
-    async getScore(question, transcript) {
-      try {
-        const response = await axios.post('http://localhost:3000/score', { question, response: transcript });
-        this.scoreFeedback = response.data.scoreFeedback;
-        this.error = '';
-        this.$nextTick(() => this.adjustCardHeight());
-      } catch (error) {
-        console.error('Error analyzing response:', error);
-        this.error = 'Error analyzing response. Please try again.';
-      }
-    },
-    async analyzeSentiment(text) {
-      try {
-        const response = await axios.post('http://localhost:3000/sentiment', { text });
-        this.sentimentAnalysis = response.data.sentimentAnalysis;
-        this.error = '';
-        console.log('Sentiment Analysis Result:', this.sentimentAnalysis);
-      } catch (error) {
-        console.error('Error analyzing sentiment:', error);
-        this.error = 'Error analyzing sentiment. Please try again.';
+        console.error('Error loading data:', error);
+        this.error = 'Error loading data. Please try again.';
+        this.loading = false;
       }
     },
     async saveQuestionData(question, response, feedback, sentimentAnalysis, scoreFeedback) {
@@ -239,7 +232,7 @@ export default {
         const cardContainerEl = this.$refs.cardContainer;
         if (feedbackEl && cardContainerEl) {
           const feedbackHeight = feedbackEl.offsetHeight;
-          cardContainerEl.style.paddingBottom = `${feedbackHeight + 5}px`;
+          cardContainerEl.style.paddingBottom = `${feedbackHeight}px`;
         }
       });
     },
@@ -486,6 +479,24 @@ button:disabled {
   font-family: sans-serif;
   font-size: 1em; /* Ensures the font size is consistent */
   text-anchor: middle;
+}
+
+.loading-spinner {
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @keyframes fadeIn {

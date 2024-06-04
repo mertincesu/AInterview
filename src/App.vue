@@ -7,7 +7,7 @@
       <About v-if="currentStep === 'about'" @go-back="goBack" @navigate-dashboard="goToDashboard"/>
       <Join v-if="currentStep === 'join'" @go-back="goBack" @navigate-newacc="goToNewacc" @auth-success="goToDashboard" />
       <Newacc v-if="currentStep === 'newacc'" @go-back="goBack" />
-      <Dashboard v-if="currentStep === 'dashboard'" @go-back="goBack" @navigate-sentiment="goToSentiment" @navigate-resume="goToResume" @navigate-analytics="goToAnalytics" @navigate-homerally="goToHomerally" @navigate-recentactivity="goToRecentactivity"/>
+      <Dashboard v-if="currentStep === 'dashboard'" @go-back="goBack" @navigate-settings="goToSettings" @navigate-sentiment="goToSentiment" @navigate-resume="goToResume" @navigate-analytics="goToAnalytics" @navigate-homerally="goToHomerally" @navigate-recentactivity="goToRecentactivity"/>
       <Rally v-if="currentStep === 'rally'" :field="selectedField" @go-back="goBack" @navigate-homerally="goToHomerally"/>
       <Profile v-if="currentStep === 'profile'" @go-back="goBack" @navigate-editprofile="goToEditprofile"/>
       <Homerally v-if="currentStep === 'homerally'" @go-back="goBack" @navigate-rally="goToRally" />
@@ -16,6 +16,7 @@
       <Editprofile v-if="currentStep === 'editprofile'" @navigate-profile="goToProfile"/>
       <Resume v-if="currentStep === 'resume' " @navigate-dashboard="goToDashboard"/>
       <Sentiment v-if="currentStep === 'sentiment' " @navigate-dashboard="goToDashboard"/>
+      <Settings v-if="currentStep === 'settings' " @navigate-dashboard="goToDashboard"/>
     </main>
   </div>
 </template>
@@ -36,6 +37,7 @@ import Analytics from './components/Analytics.vue';
 import Editprofile from './components/Editprofile.vue';
 import Resume from './components/Resume.vue';
 import Sentiment from './components/Sentiment.vue';
+import Settings from './components/Settings.vue';
 
 export default {
   name: 'App',
@@ -55,6 +57,7 @@ export default {
     Editprofile,
     Resume,
     Sentiment,
+    Settings,
   },
   data() {
     return {
@@ -109,6 +112,9 @@ export default {
     },
     goToSentiment() {
       this.currentStep = 'sentiment';
+    },
+    goToSettings() {
+      this.currentStep = 'settings';
     },
   },
 };

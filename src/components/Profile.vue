@@ -1,31 +1,87 @@
 <template>
   <div class="profile-container">
     <div v-if="loading" class="loading-spinner"></div>
-    <div v-else class="profile-card">
-      <div class="profile-header">
-        <div class="profile-picture">{{ initial }}</div>
-        <div class="profile-info">
-          <h2>{{ fullName }}</h2>
-          <h4>{{ email }}</h4>
+    <div v-else class="profile-holder">
+      <div  class="profile-card">
+        <div class="profile-header">
+          <div class="profile-picture">{{ initial }}</div>
+          <div class="profile-info">
+            <h2>{{ fullName }}</h2>
+            <h4>{{ email }}</h4>
+          </div>
+        </div>
+        <div class="profile-details">
+          <div class="profile-section">
+            <h3>Personal Information</h3>
+            <p><strong>Full Name:</strong> {{ fullName }}</p>
+            <p><strong>Country:</strong> {{ country }}</p>
+          </div>
+          <div class="profile-section">
+            <h3>Account Details</h3>
+            <p><strong>Member Since:</strong> {{ memberSince }}</p>
+            <p><strong>Last Login:</strong> {{ lastLogin }}</p>
+            <p><strong>Subscription:</strong> {{ subscription }}</p>
+          </div>
+        </div>
+        <div class="buttons-class">
+          <button @click="$emit('navigate-editprofile')" class="logout-button">Edit Profile</button>
+          <button @click="logout" class="logout-button">Logout</button>
+          <button @click="confirmDelete" class="delete-button">Delete Account</button>
         </div>
       </div>
-      <div class="profile-details">
-        <div class="profile-section">
-          <h3>Personal Information</h3>
-          <p><strong>Full Name:</strong> {{ fullName }}</p>
-          <p><strong>Country:</strong> {{ country }}</p>
+      <div class="profile-card"> 
+        <div class="profile-header">
+          <div class="profile-picture">{{ initial }}</div>
+          <div class="profile-info">
+            <h2>{{ fullName }}</h2>
+            <h4>{{ email }}</h4>
+          </div>
         </div>
-        <div class="profile-section">
-          <h3>Account Details</h3>
-          <p><strong>Member Since:</strong> {{ memberSince }}</p>
-          <p><strong>Last Login:</strong> {{ lastLogin }}</p>
-          <p><strong>Subscription:</strong> {{ subscription }}</p>
+        <div class="profile-details">
+          <div class="profile-section">
+            <h3>Personal Information</h3>
+            <p><strong>Full Name:</strong> {{ fullName }}</p>
+            <p><strong>Country:</strong> {{ country }}</p>
+          </div>
+          <div class="profile-section">
+            <h3>Account Details</h3>
+            <p><strong>Member Since:</strong> {{ memberSince }}</p>
+            <p><strong>Last Login:</strong> {{ lastLogin }}</p>
+            <p><strong>Subscription:</strong> {{ subscription }}</p>
+          </div>
+        </div>
+        <div class="buttons-class">
+          <button @click="$emit('navigate-editprofile')" class="logout-button">Edit Profile</button>
+          <button @click="logout" class="logout-button">Logout</button>
+          <button @click="confirmDelete" class="delete-button">Delete Account</button>
         </div>
       </div>
-      <div class="buttons-class">
-        <button @click="$emit('navigate-editprofile')" class="logout-button">Edit Profile</button>
-        <button @click="logout" class="logout-button">Logout</button>
-        <button @click="confirmDelete" class="delete-button">Delete Account</button>
+      <div  class="profile-card">
+        <div class="profile-header">
+          <div class="profile-picture">{{ initial }}</div>
+          <div class="profile-info">
+            <h2>{{ fullName }}</h2>
+            <h4>{{ email }}</h4>
+          </div>
+        </div>
+        <div class="profile-details">
+          <div class="profile-section">
+            <h3>Personal Information</h3>
+            <p><strong>Full Name:</strong> {{ fullName }}</p>
+            <p><strong>Country:</strong> {{ country }}</p>
+          </div>
+          <div class="profile-section">
+            <h3>Account Details</h3>
+            <p><strong>Member Since:</strong> {{ memberSince }}</p>
+            <p><strong>Last Login:</strong> {{ lastLogin }}</p>
+            <p><strong>Subscription:</strong> {{ subscription }}</p>
+          </div>
+        </div>
+        <div class="buttons-class">
+          <button @click="$emit('navigate-editprofile')" class="logout-button">Edit Profile</button>
+          <button @click="logout" class="logout-button">Logout</button>
+          <button @click="confirmDelete" class="delete-button">Delete Account</button>
+        </div>
       </div>
     </div>
 
@@ -138,6 +194,11 @@ export default {
   align-items: center;
   height: 90vh;
   background-image: linear-gradient(to right, #1c92d2, #23a997);
+}
+
+.profile-holder {
+  display: flex;
+  gap: 50px;
 }
 
 /* Profile card styles */

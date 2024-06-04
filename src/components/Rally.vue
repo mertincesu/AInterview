@@ -22,8 +22,8 @@
             <QuestionComponent v-if="currentQuestion" :question="currentQuestion" />
           </div>
           <div class="button-container">
-            <button class="start-button" @click="startThinking" v-if="!isThinking && !isRecording">Start Interview</button>
             <p v-if="isThinking || isRecording">{{ timer }} seconds remaining</p>
+            <p v-if="isLoadingNextQuestion">Loading next question...</p>
           </div>
           <div v-if="feedback" class="feedback" ref="feedback">
             {{ feedback }}
@@ -58,9 +58,10 @@ export default {
       currentQuestionIndex: 0,
       feedback: '',
       error: '',
-      isThinking: false,
+      isThinking: true,
       isRecording: false,
-      timer: 0,
+      isLoadingNextQuestion: false,
+      timer: 5,
       mediaRecorder: null,
       audioChunks: [],
       audioURL: null,
@@ -90,6 +91,7 @@ export default {
       if (data[fieldKey] && data[fieldKey][subFieldKey]) {
         this.questions = this.shuffleArray(data[fieldKey][subFieldKey]);
         console.log('Questions loaded:', this.questions);
+        this.startThinking(); // Start thinking countdown automatically
       } else {
         console.error('No questions available for this field and sub-field.');
       }
@@ -114,6 +116,7 @@ export default {
     startThinking() {
       this.isThinking = true;
       this.isRecording = false;
+      this.isLoadingNextQuestion = false;
       this.timer = 5;
       const thinkingInterval = setInterval(() => {
         if (this.timer > 0) {
@@ -127,6 +130,7 @@ export default {
     async startRecording() {
       this.isThinking = false;
       this.isRecording = true;
+      this.isLoadingNextQuestion = false;
       this.timer = 15;
       this.audioChunks = [];
       this.startCountdown();
@@ -142,7 +146,9 @@ export default {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
         this.audioURL = URL.createObjectURL(audioBlob);
         this.recorded = true;
+        this.isLoadingNextQuestion = true;
         await this.transcribeAudio(audioBlob);
+        this.isLoadingNextQuestion = false;
       };
 
       this.mediaRecorder.start();
@@ -328,7 +334,7 @@ export default {
 }
 
 /* Button styles */
-.next-button, .record-button, .start-button, .back-button {
+.next-button, .record-button, .back-button {
   width: 15%;
   padding: 15px 25px;
   font-size: 20px;
@@ -346,7 +352,7 @@ export default {
   animation: fadeIn 0.7s ease-in-out;
 }
 
-.record-button:hover, .next-button:hover, .start-button:hover, .back-button:hover {
+.record-button:hover, .next-button:hover, .back-button:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
@@ -419,3 +425,4 @@ button:disabled {
   }
 }
 </style>
+
