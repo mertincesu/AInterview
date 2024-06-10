@@ -7,7 +7,7 @@
       <About v-if="currentStep === 'about'" @go-back="goBack" @navigate-dashboard="goToDashboard"/>
       <Join v-if="currentStep === 'join'" @go-back="goBack" @navigate-newacc="goToNewacc" @auth-success="goToDashboard" />
       <Newacc v-if="currentStep === 'newacc'" @go-back="goBack" />
-      <Dashboard v-if="currentStep === 'dashboard'" @go-back="goBack" @navigate-settings="goToSettings" @navigate-sentiment="goToSentiment" @navigate-resume="goToResume" @navigate-analytics="goToAnalytics" @navigate-homerally="goToHomerally" @navigate-recentactivity="goToRecentactivity"/>
+      <Dashboard v-if="currentStep === 'dashboard'" @navigate-fullinterview="goToFullinterview" @navigate-notes="goToInterviewnotes" @navigate-tts="goToTTS" @navigate-newinterview="goToNewinterview" @go-back="goBack" @navigate-settings="goToSettings" @navigate-sentiment="goToSentiment" @navigate-resume="goToResume" @navigate-analytics="goToAnalytics" @navigate-homerally="goToHomerally" @navigate-recentactivity="goToRecentactivity"/>
       <Rally v-if="currentStep === 'rally'" :field="selectedField" @go-back="goBack" @navigate-homerally="goToHomerally"/>
       <Profile v-if="currentStep === 'profile'" @go-back="goBack" @navigate-editprofile="goToEditprofile"/>
       <Homerally v-if="currentStep === 'homerally'" @go-back="goBack" @navigate-rally="goToRally" />
@@ -17,6 +17,11 @@
       <Resume v-if="currentStep === 'resume' " @navigate-dashboard="goToDashboard"/>
       <Sentiment v-if="currentStep === 'sentiment' " @navigate-dashboard="goToDashboard"/>
       <Settings v-if="currentStep === 'settings' " @navigate-dashboard="goToDashboard"/>
+      <Interviewnotes v-if="currentStep === 'interviewnotes' " @navigate-editsavedinterview="goToEditsavedinterview" @navigate-dashboard="goToDashboard" @navigate-newinterview="goToNewinterview"/>
+      <Newinterview v-if="currentStep === 'newinterview' " @navigate-dashboard="goToDashboard"/>
+      <Editsavedinterview v-if="currentStep === 'editsavedinterview'" :interview="selectedInterview" @navigate-dashboard="goToDashboard"/>
+      <TTS v-if="currentStep === 'tts'" :interview="selectedInterview" @navigate-dashboard="goToDashboard"/>
+      <Fullinterview v-if="currentStep === 'fullinterview'" :interview="selectedInterview" @navigate-dashboard="goToDashboard"/>
     </main>
   </div>
 </template>
@@ -38,6 +43,11 @@ import Editprofile from './components/Editprofile.vue';
 import Resume from './components/Resume.vue';
 import Sentiment from './components/Sentiment.vue';
 import Settings from './components/Settings.vue';
+import Interviewnotes from './components/Interviewnotes.vue';
+import Newinterview from './components/Newinterview.vue';
+import Editsavedinterview from './components/Editsavedinterview.vue';
+import TTS from './components/TTS.vue';
+import Fullinterview from './components/Fullinterview.vue';
 
 export default {
   name: 'App',
@@ -58,11 +68,17 @@ export default {
     Resume,
     Sentiment,
     Settings,
+    Interviewnotes,
+    Newinterview,
+    Editsavedinterview,
+    TTS,
+    Fullinterview,
   },
   data() {
     return {
       currentStep: 'dashboard', // Set the initial step to 'dashboard'
       selectedField: null,
+      selectedInterview: null, // Add a property to store the selected interview
     };
   },
   methods: {
@@ -115,6 +131,22 @@ export default {
     },
     goToSettings() {
       this.currentStep = 'settings';
+    },
+    goToInterviewnotes() {
+      this.currentStep = 'interviewnotes';
+    },
+    goToNewinterview() {
+      this.currentStep = 'newinterview';
+    },
+    goToEditsavedinterview(interview) {
+      this.selectedInterview = interview; // Store the selected interview
+      this.currentStep = 'editsavedinterview';
+    },
+    goToTTS() {
+      this.currentStep = 'tts';
+    },
+    goToFullinterview() {
+      this.currentStep = 'fullinterview';
     },
   },
 };
