@@ -14,7 +14,7 @@ const PORT = 3000;
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors());
 
-const OPENAI_API_KEY = 'sk-proj-16CuIRY9EaNcKvWEfWH0T3BlbkFJdFi9RqKr1iaghbc3tMrY';
+const OPENAI_API_KEY = 'my_openai_key';
 
 const upload = multer({ dest: 'uploads/' });
 
